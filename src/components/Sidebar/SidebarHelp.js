@@ -28,25 +28,6 @@ export function SidebarHelp(props) {
       <Text fontSize="xs" color="white" mb="10px">
         Please check our docs
       </Text>
-        <Button
-          fontSize="10px"
-          fontWeight="bold"
-          w="100%"
-          bg="white"
-          _hover="none"
-          _active={{
-            bg: "white",
-            transform: "none",
-            borderColor: "transparent",
-          }}
-          _focus={{
-            boxShadow: "none",
-          }}
-          color="black"
-        >
-          DOCUMENTATION
-        </Button>
-      </Link>
     </Flex>
   );
 }
