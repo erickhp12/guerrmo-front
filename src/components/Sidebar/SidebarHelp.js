@@ -25,9 +25,6 @@ export function SidebarHelp(props) {
       <Text fontSize="sm" color="white" fontWeight="bold">
         Need help?
       </Text>
-      <Text fontSize="xs" color="white" mb="10px">
-        Please check our docs
-      </Text>
     </Flex>
   );
 }
