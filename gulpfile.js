@@ -9,7 +9,7 @@ gulp.task("licenses", async function () {
       gap.prependText(`/*!
 
       =========================================================
-      * Guerrmo - v1.0.1
+      * Purity UI Dashboard - v1.0.1
       =========================================================
       
       * Product Page: https://www.creative-tim.com/product/purity-ui-dashboard
@@ -34,7 +34,7 @@ gulp.task("licenses", async function () {
       /*!
       
       =========================================================
-      * Guerrmo - v1.0.1
+      * Purity UI Dashboard - v1.0.1
       =========================================================
       
       * Product Page: https://www.creative-tim.com/product/purity-ui-dashboard
@@ -59,7 +59,7 @@ gulp.task("licenses", async function () {
       gap.prependText(`/*!
 
       =========================================================
-      * Guerrmo - v1.0.1
+      * Purity UI Dashboard - v1.0.1
       =========================================================
       
       * Product Page: https://www.creative-tim.com/product/purity-ui-dashboard
