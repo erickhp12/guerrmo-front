@@ -26,12 +26,8 @@ function TablesOrdersRow(props) {
   });
   
   const showModal = async (id) => {
-    console.log('hola')
-    console.log(id)
     setVisibleModal(!visibleModal);
     const response = await fetch(`${config.API_URL}/articles/order/${id}`).then((response) => response.json());
-    console.log('response')
-    console.log(response.data)
     setOrderDetail(response.data)
   }
 

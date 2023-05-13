@@ -70,19 +70,12 @@ const SidebarContent = ({ logoText, routes }) => {
       }
       return (
         <NavLink to={prop.layout + prop.path} key={prop.name}>
-<<<<<<< HEAD
           {activeRoute(prop.layout + prop.path) === "active"  ? (
-=======
-          {activeRoute(prop.layout + prop.path) === "active" ? (
->>>>>>> d46fe13b0d8bfc13edf6a37bb5186e01bb89c5af
             <Button
               boxSize="initial"
               justifyContent="flex-start"
               alignItems="center"
-<<<<<<< HEAD
               hidden={client_id == 0 && prop.requireLogin && (client_id != 13 && prop.isSuperAdmin)}
-=======
->>>>>>> d46fe13b0d8bfc13edf6a37bb5186e01bb89c5af
               bg={activeBg}
               mb={{
                 xl: "12px",
@@ -134,10 +127,7 @@ const SidebarContent = ({ logoText, routes }) => {
               justifyContent="flex-start"
               alignItems="center"
               bg="transparent"
-<<<<<<< HEAD
               hidden={client_id == 0 && prop.requireLogin}
-=======
->>>>>>> d46fe13b0d8bfc13edf6a37bb5186e01bb89c5af
               mb={{
                 xl: "12px",
               }}
@@ -211,10 +201,6 @@ const SidebarContent = ({ logoText, routes }) => {
           <Stack direction="column" mb="40px">
             <Box>{links}</Box>
           </Stack>
-<<<<<<< HEAD
-=======
-          {/* <SidebarHelp /> */}
->>>>>>> d46fe13b0d8bfc13edf6a37bb5186e01bb89c5af
     </>
   )
 }

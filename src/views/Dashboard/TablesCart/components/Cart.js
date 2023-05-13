@@ -3,10 +3,7 @@ import {
   Table,
   Tbody,
   Text,
-<<<<<<< HEAD
   Button,
-=======
->>>>>>> d46fe13b0d8bfc13edf6a37bb5186e01bb89c5af
   Th,
   Thead,
   Tr,
@@ -103,7 +100,6 @@ const Cart = ({ title, captions, data }) => {
           </Tbody>
         </Table>
       </CardBody>
-<<<<<<< HEAD
       <br />
       <br />
       <Button
@@ -115,8 +111,6 @@ const Cart = ({ title, captions, data }) => {
       >
         Ordenar pedido
       </Button>
-=======
->>>>>>> d46fe13b0d8bfc13edf6a37bb5186e01bb89c5af
     </Card>
   );
 };
