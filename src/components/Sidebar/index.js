@@ -13,10 +13,8 @@ function Sidebar(props) {
   const mainPanel = React.useRef();
   let variantChange = "0.2s linear";
 
-  const { logoText, routes, sidebarVariant } = props;
+  const { routes, sidebarVariant } = props;
 
-  //  BRAND
-  //  Chakra Color Mode
   let sidebarBg = "none";
   let sidebarRadius = "0px";
   let sidebarMargins = "0px";
@@ -47,10 +45,11 @@ function Sidebar(props) {
           m={sidebarMargins}
           borderRadius={sidebarRadius}
         >
-          <SidebarContent routes={routes}
-        logoText={"PURITY UI DASHBOARD"}
-        display="none"
-        sidebarVariant={sidebarVariant}
+        <SidebarContent
+          routes={routes}
+          logoText={"Guerrmo"}
+          display="none"
+          sidebarVariant={sidebarVariant}
         />
         </Box>
       </Box>

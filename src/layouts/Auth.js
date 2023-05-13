@@ -6,9 +6,9 @@ import AuthNavbar from 'components/Navbars/AuthNavbar.js';
 import React from 'react';
 import { Redirect, Route, Switch } from 'react-router-dom';
 import routes from 'routes.js';
-import '@fontsource/roboto/400.css';
-import '@fontsource/roboto/500.css';
-import '@fontsource/roboto/700.css';
+// import '@fontsource/roboto/400.css';
+// import '@fontsource/roboto/500.css';
+// import '@fontsource/roboto/700.css';
 import theme from 'theme/theme.js';
 
 export default function Pages(props) {
@@ -21,7 +21,7 @@ export default function Pages(props) {
 		return function cleanup() {};
 	});
 	const getActiveRoute = (routes) => {
-		let activeRoute = 'Default Brand Text';
+		let activeRoute = 'Guerrmo';
 		for (let i = 0; i < routes.length; i++) {
 			if (routes[i].collapse) {
 				let collapseActiveRoute = getActiveRoute(routes[i].views);
@@ -80,7 +80,7 @@ export default function Pages(props) {
 		<ChakraProvider theme={theme} resetCss={false} w='100%'>
 			<Box ref={navRef} w='100%'>
 				<Portal containerRef={navRef}>
-					<AuthNavbar secondary={getActiveNavbar(routes)} logoText='PURITY UI DASHBOARD' />
+					<AuthNavbar secondary={getActiveNavbar(routes)} logoText='GUERRMO BALEROS Y SUSPENSIONES' />
 				</Portal>
 				<Box w='100%'>
 					<Box ref={wrapper} w='100%'>

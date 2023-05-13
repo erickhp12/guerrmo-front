@@ -5,28 +5,52 @@ import ProfileBgImage from "assets/img/ProfileBackground.png";
 import React from "react";
 import { FaCube, FaPenFancy } from "react-icons/fa";
 import { IoDocumentsSharp } from "react-icons/io5";
-import Conversations from "./components/Conversations";
 import Header from "./components/Header";
 import PlatformSettings from "./components/PlatformSettings";
 import ProfileInformation from "./components/ProfileInformation";
-import Projects from "./components/Projects";
+import InvoiceInformation from "./components/InvoiceInformation";
+import config from "../../../config.js";
+import utils from "../../../utils";
+import { useState, useEffect } from "react";
 
 function Profile() {
+  const [profile, setProfile] = useState({});
+  const [loading, setLoading] = useState(true);
+
+  const getProfile = async () => {
+    try {
+      const perfil = utils.getProfile();
+      const response = await fetch(`${config.API_URL}/clients/profile/${perfil.client_id}/`).then((response) => response.json());
+      setProfile(response.data)
+    } catch (error) {
+      console.log(error)
+    } finally {
+      setLoading(false)
+    }
+  }
+  
+  useEffect(() => {
+      if (loading) {
+        getProfile();
+      }
+  });
+
   // Chakra color mode
   const textColor = useColorModeValue("gray.700", "white");
   const bgProfile = useColorModeValue(
     "hsla(0,0%,100%,.8)",
-    "linear-gradient(112.83deg, rgba(255, 255, 255, 0.21) 0%, rgba(255, 255, 255, 0) 110.84%)"
+    "linear-gradient(112.83deg, rgba(255, 255, 255, 0.21) 0%, rgba(255, 255, 255, 0) 210.84%)"
   );
 
   return (
     <Flex direction='column'>
+      
       <Header
         backgroundHeader={ProfileBgImage}
         backgroundProfile={bgProfile}
         avatarImage={avatar4}
-        name={"Esthera Jackson"}
-        email={"esthera@simmmple.com"}
+        name={profile.nombre}
+        email={profile.mail}
         tabs={[
           {
             name: "OVERVIEW",
@@ -42,25 +66,41 @@ function Profile() {
           },
         ]}
       />
+      <br />
+      <br />
+      <br />
       <Grid templateColumns={{ sm: "1fr", xl: "repeat(3, 1fr)" }} gap='22px'>
         <PlatformSettings
-          title={"Platform Settings"}
-          subtitle1={"ACCOUNT"}
-          subtitle2={"APPLICATION"}
+          title={"Ajustes"}
+          subtitle1={"Cuenta"}
+          subtitle2={"Seguridad"}
         />
         <ProfileInformation
-          title={"Profile Information"}
-          description={
-            "Hi, I’m Esthera Jackson, Decisions: If you can’t decide, the answer is no. If two equally difficult paths, choose the one more painful in the short term (pain avoidance is creating an illusion of equality)."
-          }
-          name={"Esthera Jackson"}
-          mobile={"(44) 123 1234 123"}
-          email={"esthera@simmmple.com"}
-          location={"United States"}
+          client_id={profile.client_id}
+          nombre={profile.nombre}
+          representante={profile.representante}
+          telefono={profile.telefono}
+          celular={profile.celular}
+          mail={profile.mail}
+          limite={profile.limite}
+          precio={profile.precio}
+          diasCredito={profile.diasCredito}
         />
-        <Conversations title={"Conversations"} />
+        <InvoiceInformation
+          domicilio={profile.domicilio}
+          noExt={profile.noExt}
+          noInt={profile.noInt}
+          localidad={profile.localidad}
+          ciudad={profile.ciudad}
+          estado={profile.estado}
+          pais={profile.pais}
+          codigoPostal={profile.codigoPostal}
+          colonia={profile.colonia}
+          rfc={profile.rfc}
+          usoCfdi={profile.usoCfdi}
+          curp={profile.curp}
+        />
       </Grid>
-      <Projects title={"Projects"} description={"Architects design houses"} />
     </Flex>
   );
 }

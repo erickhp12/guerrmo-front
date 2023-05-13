@@ -1,5 +1,8 @@
 import React from "react";
-// Chakra imports
+import config from "../../config.js"
+import { useState, useEffect } from "react";
+// import { useHistory } from "react-router-dom";
+
 import {
   Box,
   Flex,
@@ -9,7 +12,6 @@ import {
   Heading,
   Input,
   Link,
-  Switch,
   Text,
   useColorModeValue,
 } from "@chakra-ui/react";
@@ -17,8 +19,40 @@ import {
 import signInImage from "assets/img/signInImage.png";
 
 function SignIn() {
+  const [client, setClient] = useState(0);
+  const [password, setPassword] = useState('');
+
+  const login = async () => {
+    try {
+      const response = await fetch(`${config.API_URL}/clients/login`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({client_id:client, password:password}),
+      }).then((response) => response.json());
+      const error = response.error
+      if (!error) {
+        const profile = JSON.stringify(response.data)
+        window.location.replace('/#/admin/profile')
+        localStorage.setItem('profile', profile)
+      } else {
+        alert('Usuario o contrasena incorrecto')
+        setClient(0)
+        setPassword('')
+      }
+    } catch (error) {
+      console.log(error)
+    }
+  }
+
+  const logInAsSguest = async () => {
+    window.location.replace('/#/admin/tables')
+  }
+
   // Chakra color mode
-  const titleColor = useColorModeValue("teal.300", "teal.200");
+  const titleColor = useColorModeValue("red.400", "teal.200");
   const textColor = useColorModeValue("gray.400", "white");
   return (
     <Flex position='relative' mb='40px'>
@@ -42,7 +76,7 @@ function SignIn() {
             p='48px'
             mt={{ md: "150px", lg: "80px" }}>
             <Heading color={titleColor} fontSize='32px' mb='10px'>
-              Welcome Back
+              Inicio de sesión
             </Heading>
             <Text
               mb='36px'
@@ -50,57 +84,72 @@ function SignIn() {
               color={textColor}
               fontWeight='bold'
               fontSize='14px'>
-              Enter your email and password to sign in
+              Inicia sesion para ver precios preferenciales
             </Text>
             <FormControl>
               <FormLabel ms='4px' fontSize='sm' fontWeight='normal'>
-                Email
+                ID Cliente
               </FormLabel>
               <Input
                 borderRadius='15px'
                 mb='24px'
+                maxLength={3}
                 fontSize='sm'
-                type='text'
-                placeholder='Your email adress'
+                type='number'
+                placeholder='ID Cliente'
                 size='lg'
+                onChange={e => setClient(e.target.value)}
               />
               <FormLabel ms='4px' fontSize='sm' fontWeight='normal'>
-                Password
+                Contraseña
               </FormLabel>
               <Input
                 borderRadius='15px'
                 mb='36px'
                 fontSize='sm'
                 type='password'
-                placeholder='Your password'
+                value={password}
+                placeholder='Contraseña'
                 size='lg'
+                onChange={e => setPassword(e.target.value)}
               />
-              <FormControl display='flex' alignItems='center'>
-                <Switch id='remember-login' colorScheme='teal' me='10px' />
-                <FormLabel
-                  htmlFor='remember-login'
-                  mb='0'
-                  ms='1'
-                  fontWeight='normal'>
-                  Remember me
-                </FormLabel>
-              </FormControl>
               <Button
-                fontSize='10px'
+                fontSize='14px'
                 type='submit'
-                bg='teal.300'
+                bg='red.400'
                 w='100%'
                 h='45'
                 mb='20px'
                 color='white'
                 mt='20px'
                 _hover={{
-                  bg: "teal.200",
+                  bg: "red.600",
                 }}
                 _active={{
-                  bg: "teal.400",
-                }}>
-                SIGN IN
+                  bg: "red.400",
+                }}
+                onClick={login}
+                >
+                Iniciar sesión
+              </Button>
+              <Button
+                fontSize='14px'
+                type='submit'
+                bg='gray.400'
+                w='100%'
+                h='45'
+                mb='20px'
+                color='white'
+                mt='20px'
+                _hover={{
+                  bg: "gray.800",
+                }}
+                _active={{
+                  bg: "gray.400",
+                }}
+                onClick={logInAsSguest}
+                >
+                Entrar como invitado
               </Button>
             </FormControl>
             <Flex
@@ -109,12 +158,12 @@ function SignIn() {
               alignItems='center'
               maxW='100%'
               mt='0px'>
-              <Text color={textColor} fontWeight='medium'>
-                Don't have an account?
+              {/* <Text color={textColor} fontWeight='medium'>
+                No tienes una cuenta?
                 <Link color={titleColor} as='span' ms='5px' fontWeight='bold'>
-                  Sign Up
+                  Registrate
                 </Link>
-              </Text>
+              </Text> */}
             </Flex>
           </Flex>
         </Flex>

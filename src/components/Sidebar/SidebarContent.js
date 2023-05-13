@@ -8,20 +8,22 @@ import {
     Text,
     useColorModeValue
 } from "@chakra-ui/react";
+import miniLogo from "assets/img/miniLogo.png";
 import IconBox from "components/Icons/IconBox";
-import { CreativeTimLogo } from "components/Icons/Icons";
 import { Separator } from "components/Separator/Separator";
-import { SidebarHelp } from "components/Sidebar/SidebarHelp";
 import React from "react";
 import { NavLink, useLocation } from "react-router-dom";
+import utils from '../../utils'
 
 // this function creates the links and collapses that appear in the sidebar (left menu)
 
 
 const SidebarContent = ({ logoText, routes }) => {
 
-    // to check for active links and opened collapses
+  // to check for active links and opened collapses
   let location = useLocation();
+  let client_id = utils.getProfile().client_id;
+  
   // this is for the rest of the collapses
   const [state, setState] = React.useState({});
 
@@ -68,11 +70,12 @@ const SidebarContent = ({ logoText, routes }) => {
       }
       return (
         <NavLink to={prop.layout + prop.path} key={prop.name}>
-          {activeRoute(prop.layout + prop.path) === "active" ? (
+          {activeRoute(prop.layout + prop.path) === "active"  ? (
             <Button
               boxSize="initial"
               justifyContent="flex-start"
               alignItems="center"
+              hidden={client_id == 0 && prop.requireLogin && (client_id != 13 && prop.isSuperAdmin)}
               bg={activeBg}
               mb={{
                 xl: "12px",
@@ -124,6 +127,7 @@ const SidebarContent = ({ logoText, routes }) => {
               justifyContent="flex-start"
               alignItems="center"
               bg="transparent"
+              hidden={client_id == 0 && prop.requireLogin}
               mb={{
                 xl: "12px",
               }}
@@ -179,28 +183,24 @@ const SidebarContent = ({ logoText, routes }) => {
   return (
     <>
         <Box pt={"25px"} mb="12px">
-      <Link
-        href={`${process.env.PUBLIC_URL}/#/`}
-        target="_blank"
-        display="flex"
-        lineHeight="100%"
-        mb="30px"
-        fontWeight="bold"
-        justifyContent="center"
-        alignItems="center"
-        fontSize="11px"
-      >
-        <CreativeTimLogo w="32px" h="32px" me="10px" />
-        <Text fontSize="sm" mt="3px">
-          {logoText}
-        </Text>
+        <Link
+          href={`${process.env.PUBLIC_URL}/#/`}
+          target="_blank"
+          display="flex"
+          lineHeight="100%"
+          mb="30px"
+          fontWeight="bold"
+          justifyContent="center"
+          alignItems="center"
+          fontSize="11px"
+        >
+        <img src={miniLogo} alt="guerrmo" />
       </Link>
       <Separator></Separator>
     </Box>
           <Stack direction="column" mb="40px">
             <Box>{links}</Box>
           </Stack>
-          <SidebarHelp />
     </>
   )
 }

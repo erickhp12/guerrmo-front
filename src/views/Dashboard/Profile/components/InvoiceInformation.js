@@ -5,17 +5,21 @@ import Card from "components/Card/Card";
 import CardBody from "components/Card/CardBody";
 import CardHeader from "components/Card/CardHeader";
 import React from "react";
+import { FaFacebook, FaInstagram, FaTwitter } from "react-icons/fa";
 
 const ProfileInformation = ({
-  client_id,
-  nombre,
-  representante,
-  telefono,
-  celular,
-  mail,
-  limite,
-  precio,
-  diasCredito,
+  domicilio,
+  noExt,
+  noInt,
+  localidad,
+  ciudad,
+  estado,
+  pais,
+  codigoPostal,
+  colonia,
+  rfc,
+  usoCfdi,
+  curp,
 }) => {
   // Chakra color mode
   const textColor = useColorModeValue("gray.700", "white");
@@ -24,98 +28,75 @@ const ProfileInformation = ({
     <Card p='16px' my={{ sm: "24px", xl: "0px" }}>
       <CardHeader p='12px 5px' mb='12px'>
         <Text fontSize='lg' color={textColor} fontWeight='bold'>
-          ID CLIENTE: {client_id}
+          Datos de facturación
         </Text>
       </CardHeader>
       <CardBody px='5px'>
         <Flex direction='column'>
           <Flex align='center' mb='18px'>
             <Text fontSize='md' color={textColor} fontWeight='bold' me='10px'>
-              Nombre:{" "}
+              Calle:{" "}
             </Text>
             <Text fontSize='md' color='gray.500' fontWeight='400'>
-              {nombre}
+              {domicilio || '--'} {noExt} -{noInt}
             </Text>
           </Flex>
           <Flex align='center' mb='18px'>
             <Text fontSize='md' color={textColor} fontWeight='bold' me='10px'>
-              Representante:{" "}
+              C.P.:{" "}
             </Text>
             <Text fontSize='md' color='gray.500' fontWeight='400'>
-              {representante}
+              {codigoPostal || '--'}
             </Text>
           </Flex>
           <Flex align='center' mb='18px'>
             <Text fontSize='md' color={textColor} fontWeight='bold' me='10px'>
-              Telefono:{" "}
+              Colonia:{" "}
             </Text>
             <Text fontSize='md' color='gray.500' fontWeight='400'>
-              {telefono || '--'}
+              {colonia || '--'}
             </Text>
           </Flex>
           <Flex align='center' mb='18px'>
             <Text fontSize='md' color={textColor} fontWeight='bold' me='10px'>
-              Celular:{" "}
+              Localidad:{" "}
             </Text>
             <Text fontSize='md' color='gray.500' fontWeight='400'>
-              {celular}
+              {localidad || '--'}
             </Text>
           </Flex>
           <Flex align='center' mb='18px'>
             <Text fontSize='md' color={textColor} fontWeight='bold' me='10px'>
-              Limite:{" "}
+              Ciudad:{" "}
             </Text>
             <Text fontSize='md' color='gray.500' fontWeight='400'>
-              {limite || '--'}
+              {ciudad || '--'} {estado || '--'}
             </Text>
           </Flex>
           <Flex align='center' mb='18px'>
             <Text fontSize='md' color={textColor} fontWeight='bold' me='10px'>
-              Dias credito:{" "}
+              RFC:{" "}
             </Text>
             <Text fontSize='md' color='gray.500' fontWeight='400'>
-              {diasCredito || '--'}
+              {rfc || '--'}
             </Text>
           </Flex>
           <Flex align='center' mb='18px'>
             <Text fontSize='md' color={textColor} fontWeight='bold' me='10px'>
-              Correos:{" "}
+              Uso CFDI:{" "}
             </Text>
             <Text fontSize='md' color='gray.500' fontWeight='400'>
-              {mail || '--'}
+              {usoCfdi || '--'}
             </Text>
           </Flex>
-          {/* <Flex align='center' mb='18px'>
+          <Flex align='center' mb='18px'>
             <Text fontSize='md' color={textColor} fontWeight='bold' me='10px'>
-              Social Media:{" "}
+              CURP:{" "}
             </Text>
-            <Flex>
-              <Link
-                href='#'
-                color='teal.300'
-                fontSize='lg'
-                me='10px'
-                _hover={{ color: "teal.300" }}>
-                <Icon as={FaFacebook} />
-              </Link>
-              <Link
-                href='#'
-                color='teal.300'
-                fontSize='lg'
-                me='10px'
-                _hover={{ color: "teal.300" }}>
-                <Icon as={FaInstagram} />
-              </Link>
-              <Link
-                href='#'
-                color='teal.300'
-                fontSize='lg'
-                me='10px'
-                _hover={{ color: "teal.300" }}>
-                <Icon as={FaTwitter} />
-              </Link>
-            </Flex>
-          </Flex> */}
+            <Text fontSize='md' color='gray.500' fontWeight='400'>
+              {curp || '--'}
+            </Text>
+          </Flex>
         </Flex>
       </CardBody>
     </Card>

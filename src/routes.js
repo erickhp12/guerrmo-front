@@ -1,65 +1,65 @@
 // import
-import Dashboard from "views/Dashboard/Dashboard";
 import Tables from "views/Dashboard/Tables";
-import Billing from "views/Dashboard/Billing";
-import RTLPage from "views/Dashboard/RTL";
+import TablesCart from "views/Dashboard/TablesCart";
+import TablesOrders from "views/Dashboard/TablesOrders";
+import TablesOrdersClients from "views/Dashboard/TablesOrdersClients";
 import Profile from "views/Dashboard/Profile";
 import SignIn from "views/Auth/SignIn.js";
-import SignUp from "views/Auth/SignUp.js";
-
 import {
-  HomeIcon,
-  StatsIcon,
-  CreditIcon,
   PersonIcon,
-  DocumentIcon,
   RocketIcon,
-  SupportIcon,
+  CartIcon,
+  DocumentIcon,
 } from "components/Icons/Icons";
+import { RiLoginBoxLine } from "react-icons/ri";
 
 var dashRoutes = [
   {
-    path: "/dashboard",
-    name: "Dashboard",
-    rtlName: "لوحة القيادة",
-    icon: <HomeIcon color="inherit" />,
-    component: Dashboard,
-    layout: "/admin",
-  },
-  {
     path: "/tables",
-    name: "Tables",
-    rtlName: "لوحة القيادة",
-    icon: <StatsIcon color="inherit" />,
+    name: "Productos",
+    requireLogin: false,
+    isSuperAdmin: false,
+    icon: <RocketIcon color="inherit" />,
     component: Tables,
     layout: "/admin",
   },
   {
-    path: "/billing",
-    name: "Billing",
-    rtlName: "لوحة القيادة",
-    icon: <CreditIcon color="inherit" />,
-    component: Billing,
+    path: "/carrito",
+    name: "Carrito",
+    requireLogin: true,
+    isSuperAdmin: false,
+    icon: <CartIcon color="inherit" />,
+    component: TablesCart,
     layout: "/admin",
   },
   {
-    path: "/rtl-support-page",
-    name: "RTL",
-    rtlName: "آرتيإل",
-    icon: <SupportIcon color="inherit" />,
-    component: RTLPage,
-    layout: "/rtl",
+    path: "/ordenes",
+    name: "Ordenes",
+    requireLogin: true,
+    isSuperAdmin: false,
+    icon: <DocumentIcon color="inherit" />,
+    component: TablesOrders,
+    layout: "/admin",
   },
   {
-    name: "ACCOUNT PAGES",
+    path: "/ordenes-clientes",
+    name: "Ordenes de clientes",
+    requireLogin: true,
+    isSuperAdmin: true,
+    icon: <DocumentIcon color="inherit" />,
+    component: TablesOrdersClients,
+    layout: "/admin",
+  },
+  {
+    name: "SITIO",
     category: "account",
-    rtlName: "صفحات",
     state: "pageCollapse",
     views: [
       {
         path: "/profile",
-        name: "Profile",
-        rtlName: "لوحة القيادة",
+        name: "Perfil",
+        requireLogin: true,
+        isSuperAdmin: false,
         icon: <PersonIcon color="inherit" />,
         secondaryNavbar: true,
         component: Profile,
@@ -67,22 +67,15 @@ var dashRoutes = [
       },
       {
         path: "/signin",
-        name: "Sign In",
-        rtlName: "لوحة القيادة",
-        icon: <DocumentIcon color="inherit" />,
+        requireLogin: false,
+        isSuperAdmin: false,
+        name: 'Iniciar sesion',
+        icon: <RiLoginBoxLine color="inherit" />,
         component: SignIn,
         layout: "/auth",
-      },
-      {
-        path: "/signup",
-        name: "Sign Up",
-        rtlName: "لوحة القيادة",
-        icon: <RocketIcon color="inherit" />,
-        secondaryNavbar: true,
-        component: SignUp,
-        layout: "/auth",
-      },
+      }
     ],
   },
 ];
+
 export default dashRoutes;
