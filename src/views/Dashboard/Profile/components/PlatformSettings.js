@@ -35,7 +35,11 @@ const PlatformSettings = ({ title, subtitle1, subtitle2 }) => {
             {subtitle2}
           </Text>
           <Flex align='center' mb='20px'>
+<<<<<<< HEAD
             <Switch colorscheme='teal' me='10px' />
+=======
+            <Switch colorScheme='teal' me='10px' />
+>>>>>>> d46fe13b0d8bfc13edf6a37bb5186e01bb89c5af
             <Text noOfLines={1} fontSize='md' color='gray.500' fontWeight='400'>
               Cambiar contrasena
             </Text>

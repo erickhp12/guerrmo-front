@@ -30,9 +30,12 @@ import utils from "../../utils";
 export default function HeaderLinks(props) {
   const { variant, children, fixed, secondary, onOpen, ...rest } = props;
 
+<<<<<<< HEAD
   const logout = () => {
     localStorage.clear();
   }
+=======
+>>>>>>> d46fe13b0d8bfc13edf6a37bb5186e01bb89c5af
   const profile = utils.getProfile();
   // Chakra Color Mode
   let mainTeal = useColorModeValue("teal.300", "teal.300");
@@ -117,6 +120,10 @@ export default function HeaderLinks(props) {
         logoText={props.logoText}
         secondary={props.secondary}
         routes={routes}
+<<<<<<< HEAD
+=======
+        // logo={logo}
+>>>>>>> d46fe13b0d8bfc13edf6a37bb5186e01bb89c5af
         {...rest}
       />
       <Menu>

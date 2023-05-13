@@ -21,9 +21,14 @@ const textColor = useColorModeValue("gray.700", "white");
 
 const getProducts = async () => {
   try {
+<<<<<<< HEAD
     console.log('1')
     const perfil = utils.getProfile();
     const response = await fetch(`${config.API_URL}/articles/${perfil.price}`, {mode: 'cors'}).then((response) => response.json());
+=======
+    const perfil = utils.getProfile();
+    const response = await fetch(`${config.API_URL}/articles/${perfil.price}`).then((response) => response.json());
+>>>>>>> d46fe13b0d8bfc13edf6a37bb5186e01bb89c5af
     setProducts(response)
   } catch (error) {
     console.log(error)
