@@ -6,7 +6,6 @@ import {
   useColorModeValue
 } from "@chakra-ui/react";
 import React from "react";
-import axios from 'axios';
 import Products from "./components/Products";
 import config from "config";
 import { useState, useEffect } from "react";
