@@ -54,7 +54,7 @@ function TablesOrdersRow(props) {
             <Tr>
               <Td fontWeight="bold" fontSize="md" >Clave</Td>
               <Td fontWeight="bold" fontSize="md" >Precio</Td>
-              <Td fontWeight="bold" fontSize="md" >Cant.</Td>
+              <Td fontWeight="bold" fontSize="md" >Canidad.</Td>
               <Td fontWeight="bold" fontSize="md" >Descripcion</Td>
             </Tr>
           </Thead>
@@ -73,7 +73,7 @@ function TablesOrdersRow(props) {
                   </Text>
                 </Td>
                 <Td>
-                  <Text fontSize="sm" maxWidth="10%">
+                  <Text fontSize="sm" maxWidth="50%">
                   {item.qty}
                   </Text>
                 </Td>
@@ -111,7 +111,7 @@ function TablesOrdersRow(props) {
         </Flex>
       </Td>
       <Td>
-        <Flex w="10%" direction="column">
+        <Flex w="50%" direction="column">
           <Text fontSize="sm" color={textColor} fontWeight="semi-bold">
             {total_items}
           </Text>

@@ -38,7 +38,7 @@ function TablesOrdersClientsRow(props) {
           <Tr>
             <Td fontWeight="bold" fontSize="md" >Clave</Td>
             <Td fontWeight="bold" fontSize="md" >Precio</Td>
-            <Td fontWeight="bold" fontSize="md" >Cant.</Td>
+            <Td fontWeight="bold" fontSize="md" >Cantidad</Td>
             <Td fontWeight="bold" fontSize="md" >Descripcion</Td>
           </Tr>
         </Thead>
@@ -57,7 +57,7 @@ function TablesOrdersClientsRow(props) {
                 </Text>
               </Td>
               <Td>
-                <Text fontSize="sm" maxWidth="10%">
+                <Text fontSize="sm" maxWidth="50%">
                   {item.qty}
                 </Text>
               </Td>
@@ -98,7 +98,7 @@ function TablesOrdersClientsRow(props) {
       <Td>
         <Flex direction="column">
            <Button onClick={() => markDelivered(id)}>
-            Entregar
+            Terminar
           </Button>
         </Flex>
       </Td>

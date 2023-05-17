@@ -18,8 +18,14 @@ function TablesProductRow(props) {
 
   const [loading, setLoading] = useState(true);
   const [existence, setExistence] = useState(0);
+  const [client, setClient] = useState(0);
   const [cartText, setCartText] = useState('Agregar al carrito');
   const [addedToCart, setAddedToCart] = useState(false);
+
+  const getProfile = () =>{
+    const profile = utils.getProfile();
+    setClient(profile);
+  };
 
   const addCart = async (data) => {
     try {
@@ -51,6 +57,7 @@ function TablesProductRow(props) {
     if (loading) {
       setExistence(existencia);
       addCart();
+      getProfile();
       setLoading(false);
     }
 });
@@ -90,7 +97,7 @@ function TablesProductRow(props) {
       <Td>
         <Flex direction="column">
           <Text fontSize="md" color={textColor} fontWeight="semi-bold">
-            ${precio}
+            {client.client_id === 0 ? '--' : `${precio}` }
           </Text>
         </Flex>
       </Td>

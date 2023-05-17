@@ -109,7 +109,7 @@ const Cart = ({ title, captions, data }) => {
         bg={"green.500"}
         boxShadow="0 2px 12px 0 rgb(0 0 0 / 16%)"
       >
-        Ordenar pedido
+        Mandar cotizacion
       </Button>
     </Card>
   );

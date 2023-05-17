@@ -1,5 +1,5 @@
 // Chakra imports
-import { Flex, Switch, Text, useColorModeValue } from "@chakra-ui/react";
+import { Flex, Switch, Text, useColorModeValue, Button } from "@chakra-ui/react";
 // Custom components
 import Card from "components/Card/Card";
 import CardBody from "components/Card/CardBody";
@@ -7,6 +7,10 @@ import CardHeader from "components/Card/CardHeader";
 import React from "react";
 
 const PlatformSettings = ({ title, subtitle1, subtitle2 }) => {
+
+  const changePassword = () => {
+    console.log('hola')
+  }
   // Chakra color mode
   const textColor = useColorModeValue("gray.700", "white");
   return (
@@ -22,7 +26,7 @@ const PlatformSettings = ({ title, subtitle1, subtitle2 }) => {
             {subtitle1}
           </Text>
           <Flex align='center' mb='20px'>
-            <Switch colorscheme='teal' me='10px' />
+            <Switch defaultChecked colorscheme='teal' me='10px' />
             <Text noOfLines={0} fontSize='md' color='gray.500' fontWeight='400'>
               Activa
             </Text>
@@ -34,11 +38,25 @@ const PlatformSettings = ({ title, subtitle1, subtitle2 }) => {
             m='6px 0px 20px 0px'>
             {subtitle2}
           </Text>
-          <Flex align='center' mb='20px'>
-            <Switch colorscheme='teal' me='10px' />
-            <Text noOfLines={1} fontSize='md' color='gray.500' fontWeight='400'>
+          <Flex align='center'>
+            <Button 
+            fontSize='14px'
+            type='submit'
+            bg='red.400'
+            w='100%'
+            h='45'
+            mb='20px'
+            color='white'
+            mt='20px'
+            _hover={{
+              bg: "red.600",
+            }}
+            _active={{
+              bg: "red.400",
+            }}
+            onClick={() => changePassword()}>
               Cambiar contrasena
-            </Text>
+          </Button>
           </Flex>
         </Flex>
       </CardBody>

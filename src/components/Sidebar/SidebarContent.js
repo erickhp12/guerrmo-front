@@ -75,7 +75,7 @@ const SidebarContent = ({ logoText, routes }) => {
               boxSize="initial"
               justifyContent="flex-start"
               alignItems="center"
-              hidden={client_id == 0 && prop.requireLogin && (client_id != 13 && prop.isSuperAdmin)}
+              hidden={client_id == 0 && prop.requireLogin || client_id !== 0 && prop.isLogin}
               bg={activeBg}
               mb={{
                 xl: "12px",
@@ -127,7 +127,7 @@ const SidebarContent = ({ logoText, routes }) => {
               justifyContent="flex-start"
               alignItems="center"
               bg="transparent"
-              hidden={client_id == 0 && prop.requireLogin}
+              hidden={(prop.isSuperAdmin && client_id !== 355) || (client_id === 0 && prop.requireLogin) || client_id !== 0 && prop.isLogin}
               mb={{
                 xl: "12px",
               }}
