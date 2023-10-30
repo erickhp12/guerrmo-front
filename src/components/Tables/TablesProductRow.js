@@ -108,9 +108,9 @@ function TablesProductRow(props) {
           </Text>
         </Flex>
       </Td>
-      <Td>
+      <Td hidden = { client.client_id === 0 || existence == 0}>
         <Button
-          disabled={addedToCart}
+          disabled={addedToCart }
           p="0px"
           bg="transparent"
           variant="no-hover">

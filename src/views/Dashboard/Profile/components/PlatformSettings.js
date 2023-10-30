@@ -6,7 +6,7 @@ import CardBody from "components/Card/CardBody";
 import CardHeader from "components/Card/CardHeader";
 import React from "react";
 
-const PlatformSettings = ({ title, subtitle1, subtitle2 }) => {
+const PlatformSettings = ({ title }) => {
 
   const changePassword = () => {
     console.log('hola')
@@ -22,22 +22,6 @@ const PlatformSettings = ({ title, subtitle1, subtitle2 }) => {
       </CardHeader>
       <CardBody px='5px'>
         <Flex direction='column'>
-          <Text fontSize='sm' color='gray.500' fontWeight='600' mb='20px'>
-            {subtitle1}
-          </Text>
-          <Flex align='center' mb='20px'>
-            <Switch defaultChecked colorscheme='teal' me='10px' />
-            <Text noOfLines={0} fontSize='md' color='gray.500' fontWeight='400'>
-              Activa
-            </Text>
-          </Flex>
-          <Text
-            fontSize='sm'
-            color='gray.500'
-            fontWeight='600'
-            m='6px 0px 20px 0px'>
-            {subtitle2}
-          </Text>
           <Flex align='center'>
             <Button 
             fontSize='14px'

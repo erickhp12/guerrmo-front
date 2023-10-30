@@ -52,9 +52,9 @@ function TablesOrdersRow(props) {
         <Table hidden={!orderDetail}>
           <Thead>
             <Tr>
-              <Td fontWeight="bold" fontSize="md" >Clave</Td>
+              <Td fontWeight="bold" fontSize="md" >ClaveProducto</Td>
               <Td fontWeight="bold" fontSize="md" >Precio</Td>
-              <Td fontWeight="bold" fontSize="md" >Canidad.</Td>
+              <Td fontWeight="bold" fontSize="md" >Cantidad</Td>
               <Td fontWeight="bold" fontSize="md" >Descripcion</Td>
             </Tr>
           </Thead>

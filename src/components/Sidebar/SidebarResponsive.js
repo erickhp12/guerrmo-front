@@ -248,7 +248,7 @@ function SidebarResponsive(props) {
           >
             <DrawerCloseButton
               _focus={{ boxShadow: "none" }}
-              _hover={{ boxShadow: "none" }}
+              _hover={{ bpoxShadow: "none" }}
             />
             <DrawerBody maxW="250px" px="1rem">
               <Box maxW="100%" h="100vh">
@@ -256,7 +256,6 @@ function SidebarResponsive(props) {
                 <Stack direction="column" mb="40px">
                   <Box>{links}</Box>
                 </Stack>
-                <SidebarHelp></SidebarHelp>
               </Box>
             </DrawerBody>
           </DrawerContent>

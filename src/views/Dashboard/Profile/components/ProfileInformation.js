@@ -63,14 +63,6 @@ const ProfileInformation = ({
           </Flex>
           <Flex align='center' mb='18px'>
             <Text fontSize='md' color={textColor} fontWeight='bold' me='10px'>
-              Limite:{" "}
-            </Text>
-            <Text fontSize='md' color='gray.500' fontWeight='400'>
-              {limite || '--'}
-            </Text>
-          </Flex>
-          <Flex align='center' mb='18px'>
-            <Text fontSize='md' color={textColor} fontWeight='bold' me='10px'>
               Dias credito:{" "}
             </Text>
             <Text fontSize='md' color='gray.500' fontWeight='400'>

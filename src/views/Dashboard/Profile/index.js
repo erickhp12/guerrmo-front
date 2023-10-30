@@ -44,7 +44,6 @@ function Profile() {
 
   return (
     <Flex direction='column'>
-      
       <Header
         backgroundHeader={ProfileBgImage}
         backgroundProfile={bgProfile}
@@ -71,7 +70,8 @@ function Profile() {
       <br />
       <Grid templateColumns={{ sm: "1fr", xl: "repeat(3, 1fr)" }} gap='22px'>
         <PlatformSettings
-          title={"Ajustes"}
+          active={profile.status}
+          title={"Seguridad"}
           subtitle1={"Cuenta"}
           subtitle2={"Seguridad"}
         />

@@ -36,7 +36,7 @@ const Cart = ({ title, captions, data }) => {
         },
         body: JSON.stringify(dataToSend),
       });
-      window.location.replace('/#/admin/profile')
+      window.location.replace('/#/admin/ordenes')
     } catch(error) {
       console.log(error);
     }
@@ -51,7 +51,7 @@ const Cart = ({ title, captions, data }) => {
       </CardHeader>
       <CardBody>
         <Table variant='simple' color={textColor}>
-          <Thead>
+          <Thead hidden = {data.items && data.items.length <= 0}>
             <Tr my='.8rem' pl='0px' color='gray.400'>
               {captions.map((caption, idx) => {
                 return (
@@ -87,9 +87,8 @@ const Cart = ({ title, captions, data }) => {
             </Tbody>
           )}
           <br />
-          <Separator></Separator>
           <Tbody>
-            <Tr>
+            <Tr hidden = {data.items && data.items.length <= 0}>
               <Td></Td>
               <Td textAlign='right' fontWeight="bold">TOTAL:</Td>
               <Td fontSize="lg" color={textColor} fontWeight="bold">${data.total_price}</Td>
@@ -103,6 +102,7 @@ const Cart = ({ title, captions, data }) => {
       <br />
       <br />
       <Button
+        hidden = {data.items && data.items.length <= 0}
         h="52px"
         w="152px"
         onClick={() => submitOrder()}
