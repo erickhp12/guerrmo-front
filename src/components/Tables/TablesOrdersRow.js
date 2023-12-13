@@ -12,7 +12,6 @@ import {
 } from "@chakra-ui/react";
 import React, { useState, useEffect } from "react";
 import moment from 'moment';
-import SweetAlert from "react-bootstrap-sweetalert";
 import config from 'config'
 
 import { FaEye } from "react-icons/fa";
@@ -43,7 +42,7 @@ function TablesOrdersRow(props) {
   return (
     <Tr>
       <div hidden={!visibleModal}>
-        <SweetAlert
+      {/* <SweetAlert
           type="lg"
           hidden
           // title={`Orden ${id}`}
@@ -87,7 +86,7 @@ function TablesOrdersRow(props) {
             })}
           </Tbody>
         </Table>
-      </SweetAlert>
+      </SweetAlert> */}
       </div>
       <Td maxWidth={{ sm: "20px" }} pl="0px">
         <Flex align="center" py=".8rem" minWidth="100%" flexWrap="nowrap">
