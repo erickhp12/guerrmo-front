@@ -19,16 +19,14 @@ function TablesProductRow(props) {
   const [loading, setLoading] = useState(true);
   const [existence, setExistence] = useState(0);
   const [client, setClient] = useState(0);
-  const [cartText, setCartText] = useState('Agregar al carrito');
+  const [cartText, setCartText] = useState('Agregar');
   const [addedToCart, setAddedToCart] = useState(false);
+  const [count, setCount] = useState(0);
 
-  const getProfile = () =>{
-    const profile = utils.getProfile();
-    setClient(profile);
-  };
 
   const addCart = async (data) => {
     try {
+      console.log('entrando a addCart', new Date());
       const profile = utils.getProfile();
       const dataToSend = {
         client: profile.client_id,
@@ -46,35 +44,35 @@ function TablesProductRow(props) {
         body: JSON.stringify(dataToSend),
       }).then((response) => response.json());
       setExistence(existence-1);
-      setCartText('Agregado al carrito');
+      setCartText('Agregado');
       setAddedToCart(true);
     } catch(error) {
       console.log('Error al agregar al carrito ' + error.toString());
     }
   }
 
-  useEffect(() => {
-    if (loading) {
-      setExistence(existencia);
-      addCart();
-      getProfile();
-      setLoading(false);
-    }
-});
+  // useEffect(() => {
+  //     console.log('entrando', count)
+      // setExistence(existenciaHenequen);
+  //     // addCart();
+  //     getProfile();
+  //     setLoading(false);
+  //     setCount(1);
+  // }, []);
 
-  const { item, clave, claveAlterna, precio, existencia, descripcion, caracteristicas } = props;
+  const { item, clave, claveAlterna, precio, existenciaHenequen, existenciaMezquital, existenciaCarlosAmaya,  descripcion, caracteristicas } = props;
   const textColor = useColorModeValue("gray.700", "white");
 
   return (
     <Tr>
-      <Td minWidth={{ sm: "250px" }} pl="0px">
+      <Td minWidth={{ sm: "150px" }} pl="0px">
         <Flex align="center" py=".8rem" minWidth="100%" flexWrap="nowrap">
           <Flex direction="column">
             <Text
               fontSize="md"
               color={textColor}
               fontWeight="bold"
-              minWidth="100%"
+              minWidth="50%"
             >
               {clave}
             </Text>
@@ -97,18 +95,32 @@ function TablesProductRow(props) {
       <Td>
         <Flex direction="column">
           <Text fontSize="md" color={textColor} fontWeight="semi-bold">
-            {client.client_id === 0 ? '--' : `${precio}` }
+            {client.client_id === 0 ? '--' : `$${precio}` }
           </Text>
         </Flex>
       </Td>
       <Td>
         <Flex direction="column">
           <Text fontSize="md" color={textColor} fontWeight="semi-bold">
-            {existence}
+            {existenciaHenequen}
           </Text>
         </Flex>
       </Td>
-      <Td hidden = { client.client_id === 0 || existence == 0}>
+      <Td>
+        <Flex direction="column">
+          <Text fontSize="md" color={textColor} fontWeight="semi-bold">
+            {existenciaMezquital}
+          </Text>
+        </Flex>
+      </Td>
+      <Td minWidth={{ sm: "200px" }}>
+        <Flex direction="column">
+          <Text fontSize="md" color={textColor} fontWeight="semi-bold">
+            {existenciaCarlosAmaya}
+          </Text>
+        </Flex>
+      </Td>
+      <Td hidden = { client.client_id === 0}>
         <Button
           disabled={addedToCart }
           p="0px"
@@ -116,13 +128,13 @@ function TablesProductRow(props) {
           variant="no-hover">
           <Text
             fontSize="sm"
-            color={addedToCart ? "dark.300" : "green.300"}
+            color={addedToCart ? "dark.300" : "green.500"}
             fontWeight="bold"
             cursor="pointer"
             onClick={() => addCart(item)}
           >
             <CartIcon color="inherit" />
-            &nbsp;{cartText}
+            &nbsp;&nbsp;{cartText}
           </Text>
         </Button>
       </Td>

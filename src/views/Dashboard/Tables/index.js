@@ -1,5 +1,9 @@
 // Chakra imports
 import {
+  Skeleton, Stack,
+  Box, 
+  SkeletonCircle,
+  SkeletonText,
   Flex,
   Text,
   Input,
@@ -32,27 +36,32 @@ const getProducts = async () => {
 
 const searchProduct = async (e) => {
   if (e.key == 'Enter') {
-    try {
-      const perfil = utils.getProfile();
-      const response = await fetch(`${config.API_URL}/articles/${perfil.price}/clave/${e.target.value}`).then((response) => response.json());
-      setProducts(response)
-    } catch (error) {
-      console.log(error)
-    } finally {
-      setLoading(false)
-    }
-    } else if (e.target.value == '') {
-      getProducts();
-    } else {
+    if (e.target.value === '') {
+      console.log('caso 1')
+      getProducts()
       return;
+    } else {
+      try {
+        console.log('caso 2')
+        setLoading(true);
+        const perfil = utils.getProfile();
+        const response = await fetch(`${config.API_URL}/articles/${perfil.price}/clave/${e.target.value}`).then((response) => response.json());
+        setProducts(response)
+      } catch (error) {
+        console.log(error)
+      } finally {
+        setLoading(false)
+      }
+    }
   }
+  return;
 }
 
 useEffect(() => {
-    if (loading) {
-      getProducts();
-    }
-});
+    // if (loading) {
+    getProducts();
+    // }
+},[]);
 
   return (
     <Flex direction='column' pt={{ base: "120px", md: "75px" }}>
@@ -71,11 +80,17 @@ useEffect(() => {
         </CardBody>
       </Card>
         <br />
+        { loading ? (
+        <Box padding='6' boxShadow='lg' bg='white'>
+          <SkeletonText mt='5' noOfLines={40} spacing='4' fadeDuration={0.8} />
+        </Box>
+      ) : (
       <Products
         title={"Productos"}
-        captions={["clave", "articulo", "Precio", "Existencia", "Accion"]}
+        captions={["clave", "articulo", "Precio", "Henequen", "Mezquital", "Carlos Amaya", "Accion"]}
         data={products}
       />
+      )}
     </Flex>
   );
 }

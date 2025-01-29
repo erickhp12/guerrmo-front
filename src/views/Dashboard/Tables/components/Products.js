@@ -46,7 +46,9 @@ const Products = ({ title, captions, data }) => {
                   clave={row.clave}
                   claveAlterna={row.claveAlterna}
                   precio={row.precio}
-                  existencia={row.existencia}
+                  existenciaHenequen={row.existenciaHenequen}
+                  existenciaMezquital={row.existenciaMezquital}
+                  existenciaCarlosAmaya={row.existenciaCarlosAmaya}
                   descripcion={row.descripcion}
                   caracteristicas={row.caracteristicas}
                 />
