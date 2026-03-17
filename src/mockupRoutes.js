@@ -5,12 +5,14 @@ import Catalogo from './views/Mockup/Catalogo';
 import ProductoDetalle from './views/Mockup/ProductoDetalle';
 import Pedido from './views/Mockup/Pedido';
 import AdminPanel from './views/Mockup/AdminPanel';
+import CategoriaProductos from './views/Mockup/CategoriaProductos';
 
 const MockupRoutes = () => {
   return (
     <Switch>
       <Route exact path="/" component={Home} />
       <Route exact path="/catalogo" component={Catalogo} />
+      <Route exact path="/categoria/:dep_id" component={CategoriaProductos} />
       <Route exact path="/producto/:id" component={ProductoDetalle} />
       <Route exact path="/pedido" component={Pedido} />
       <Route exact path="/admin" component={AdminPanel} />
