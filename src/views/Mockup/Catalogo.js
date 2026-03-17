@@ -87,7 +87,11 @@ const Catalogo = () => {
               <div>
                 <label className="block text-lg font-medium text-gray-700 mb-2">Categorías</label>
                 {loading ? (
-                  <p className="text-sm text-gray-500">Cargando...</p>
+                  <div className="space-y-2 animate-pulse">
+                    {Array.from({ length: 6 }).map((_, i) => (
+                      <div key={i} className="h-9 bg-gray-200 rounded-lg w-full" />
+                    ))}
+                  </div>
                 ) : (
                   <div className="space-y-2 max-h-full overflow-y-auto">
                     <button
@@ -128,8 +132,17 @@ const Catalogo = () => {
             </div>
 
             {loading ? (
-              <div className="bg-white rounded-xl p-12 text-center">
-                <p className="text-gray-500 text-lg">Cargando categorías...</p>
+              <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {Array.from({ length: 6 }).map((_, i) => (
+                  <div key={i} className="bg-white rounded-xl shadow-sm overflow-hidden animate-pulse">
+                    <div className="w-full h-48 bg-gray-200" />
+                    <div className="p-5 space-y-3">
+                      <div className="h-5 bg-gray-200 rounded w-3/4" />
+                      <div className="h-4 bg-gray-200 rounded w-1/2" />
+                      <div className="h-9 bg-gray-200 rounded-lg w-full mt-2" />
+                    </div>
+                  </div>
+                ))}
               </div>
             ) : displayCategories.length === 0 ? (
               <div className="bg-white rounded-xl p-12 text-center">
@@ -138,20 +151,33 @@ const Catalogo = () => {
             ) : (
               <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {displayCategories.map(cat => (
-                  <div key={cat.id} className="bg-white rounded-xl shadow-sm hover:shadow-lg transition overflow-hidden">
-                    {cat.imagen && (
-                      <img src={cat.imagen} alt={cat.departamento} className="w-full h-48 object-cover" />
+                  <div key={cat.id} className="bg-white rounded-xl shadow-sm hover:shadow-lg transition overflow-hidden group">
+                    {cat.imagen ? (
+                      <div className="w-full h-48 overflow-hidden">
+                        <img
+                          src={cat.imagen}
+                          alt={cat.departamento}
+                          className="w-full h-48 object-cover group-hover:scale-105 transition duration-300"
+                        />
+                      </div>
+                    ) : (
+                      <div className="w-full h-48 bg-gradient-to-br from-gray-100 to-gray-200 flex items-center justify-center">
+                        <span className="text-5xl text-gray-300">🔧</span>
+                      </div>
                     )}
                     <div className="p-5">
                       <h3 className="font-bold text-lg text-gray-900">{cat.departamento}</h3>
-                      <p className="text-sm text-gray-600 mt-2">{cat.total} productos disponibles</p>
-                      
+                      <div className="flex items-center gap-2 mt-2">
+                        <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold bg-blue-100 text-blue-700">
+                          {cat.total?.toLocaleString()} productos
+                        </span>
+                      </div>
                       <div className="mt-4">
                         <Link
                           to={`/categoria/${cat.id}`}
                           className="block w-full text-center bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 transition text-sm font-semibold"
                         >
-                          Ver productos
+                          Ver productos →
                         </Link>
                       </div>
                     </div>
