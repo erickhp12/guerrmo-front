@@ -7,10 +7,10 @@ const SkeletonRow = () => (
   <tr className="animate-pulse">
     <td className="px-4 py-3"><div className="h-4 bg-gray-200 rounded w-24" /></td>
     <td className="px-4 py-3"><div className="h-4 bg-gray-200 rounded w-48" /></td>
-    <td className="px-4 py-3"><div className="h-4 bg-gray-200 rounded w-28" /></td>
-    <td className="px-4 py-3"><div className="h-4 bg-gray-200 rounded w-32" /></td>
+    <td className="px-4 py-3 hidden md:table-cell"><div className="h-4 bg-gray-200 rounded w-28" /></td>
+    <td className="px-4 py-3 hidden lg:table-cell"><div className="h-4 bg-gray-200 rounded w-32" /></td>
     <td className="px-4 py-3"><div className="h-4 bg-gray-200 rounded w-16 ml-auto" /></td>
-    <td className="px-4 py-3"><div className="h-6 bg-gray-200 rounded-full w-20 ml-auto" /></td>
+    <td className="px-4 py-3 hidden sm:table-cell"><div className="h-6 bg-gray-200 rounded-full w-20 ml-auto" /></td>
     <td className="px-4 py-3"><div className="h-7 bg-gray-200 rounded-lg w-20 mx-auto" /></td>
   </tr>
 );
@@ -18,7 +18,17 @@ const SkeletonRow = () => (
 const useQueryParams = () => {
   const location = useLocation();
   const history = useHistory();
-  const params = new URLSearchParams(location.search);
+
+  const getParam = (key, fallback = '') => {
+    const params = new URLSearchParams(location.search);
+    return params.get(key) ?? fallback;
+  };
+
+  const getParamArray = (key) => {
+    const params = new URLSearchParams(location.search);
+    const val = params.get(key);
+    return val ? val.split(',').filter(Boolean) : [];
+  };
 
   const setParam = (key, value) => {
     const next = new URLSearchParams(location.search);
@@ -30,14 +40,13 @@ const useQueryParams = () => {
     history.replace({ search: next.toString() });
   };
 
-  const getParam = (key, fallback = '') => params.get(key) ?? fallback;
-
-  return { getParam, setParam };
+  return { getParam, getParamArray, setParam, history };
 };
 
 const CategoriaProductos = () => {
   const { dep_id } = useParams();
-  const { getParam, setParam } = useQueryParams();
+  const { getParam, getParamArray, setParam, history } = useQueryParams();
+  const [filtersOpen, setFiltersOpen] = useState(false);
 
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -47,8 +56,7 @@ const CategoriaProductos = () => {
   // Filters from URL
   const search = getParam('q', '');
   const sortBy = getParam('sort', 'relevancia');
-  const stockFilter = getParam('stock', 'todos'); // todos | con | sin
-  const selectedCategoria = getParam('categoria', '');
+  const selectedCategorias = getParamArray('categorias'); // multi-select array
   const minPrecio = getParam('minPrecio', '');
   const maxPrecio = getParam('maxPrecio', '');
 
@@ -72,39 +80,42 @@ const CategoriaProductos = () => {
     });
   }, [dep_id]);
 
-  // Unique subcategories derived from loaded products
   const subcategorias = useMemo(() => {
     const set = new Set(products.map(p => p.categoria).filter(Boolean));
     return Array.from(set).sort();
   }, [products]);
 
-  // Price bounds for range hints
-  const precioMin = useMemo(() => Math.floor(Math.min(...products.map(p => Number(p.precio) || 0))), [products]);
-  const precioMax = useMemo(() => Math.ceil(Math.max(...products.map(p => Number(p.precio) || 0))), [products]);
+  const precioMin = useMemo(
+    () => products.length ? Math.floor(Math.min(...products.map(p => Number(p.precio) || 0))) : 0,
+    [products]
+  );
+  const precioMax = useMemo(
+    () => products.length ? Math.ceil(Math.max(...products.map(p => Number(p.precio) || 0))) : 0,
+    [products]
+  );
+
+  const toggleCategoria = (cat) => {
+    const next = selectedCategorias.includes(cat)
+      ? selectedCategorias.filter(c => c !== cat)
+      : [...selectedCategorias, cat];
+    setParam('categorias', next.length ? next.join(',') : null);
+  };
 
   const filtered = useMemo(() => {
     return products.filter(p => {
-      // Text search
       const matchSearch = [p.clave, p.claveAlterna, p.descripcion, p.categoria, p.caracteristicas]
         .some(f => f?.toLowerCase().includes(search.toLowerCase()));
       if (!matchSearch) return false;
 
-      // Stock filter
-      const enStock = Number(p.existencia) > 0;
-      if (stockFilter === 'con' && !enStock) return false;
-      if (stockFilter === 'sin' && enStock) return false;
+      if (selectedCategorias.length > 0 && !selectedCategorias.includes(p.categoria)) return false;
 
-      // Subcategory filter
-      if (selectedCategoria && p.categoria !== selectedCategoria) return false;
-
-      // Price range
       const precio = Number(p.precio);
       if (minPrecio !== '' && precio < Number(minPrecio)) return false;
       if (maxPrecio !== '' && precio > Number(maxPrecio)) return false;
 
       return true;
     });
-  }, [products, search, stockFilter, selectedCategoria, minPrecio, maxPrecio]);
+  }, [products, search, selectedCategorias, minPrecio, maxPrecio]);
 
   const sorted = useMemo(() => {
     return [...filtered].sort((a, b) => {
@@ -118,8 +129,7 @@ const CategoriaProductos = () => {
   const inStock = products.filter(p => Number(p.existencia) > 0).length;
 
   const activeFiltersCount = [
-    stockFilter !== 'todos',
-    selectedCategoria !== '',
+    selectedCategorias.length > 0,
     minPrecio !== '',
     maxPrecio !== '',
   ].filter(Boolean).length;
@@ -128,27 +138,123 @@ const CategoriaProductos = () => {
     const next = new URLSearchParams();
     if (search) next.set('q', search);
     if (sortBy !== 'relevancia') next.set('sort', sortBy);
-    window.history.replaceState(null, '', `?${next.toString()}`);
-    window.dispatchEvent(new PopStateEvent('popstate'));
+    history.replace({ search: next.toString() });
   };
+
+  const FilterPanel = () => (
+    <div className="space-y-5">
+      <div className="flex items-center justify-between">
+        <h2 className="font-bold text-gray-800 text-base">Filtros</h2>
+        {activeFiltersCount > 0 && (
+          <button onClick={clearAllFilters} className="text-xs text-red-500 hover:underline font-medium">
+            Limpiar ({activeFiltersCount})
+          </button>
+        )}
+      </div>
+
+      {/* Rango de precio */}
+      <div>
+        <p className="text-xs font-semibold text-gray-500 uppercase mb-2">Rango de precio</p>
+        {!loading && products.length > 0 && (
+          <p className="text-xs text-gray-400 mb-2">
+            ${precioMin.toLocaleString('es-MX')} – ${precioMax.toLocaleString('es-MX')}
+          </p>
+        )}
+        <div className="flex gap-2">
+          <div className="flex-1">
+            <label className="text-xs text-gray-500 mb-1 block">Mín</label>
+            <input
+              type="number"
+              min="0"
+              placeholder="0"
+              value={minPrecio}
+              onChange={e => setParam('minPrecio', e.target.value || null)}
+              disabled={loading}
+              className="w-full px-2 py-1.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:bg-gray-50"
+            />
+          </div>
+          <div className="flex-1">
+            <label className="text-xs text-gray-500 mb-1 block">Máx</label>
+            <input
+              type="number"
+              min="0"
+              placeholder="∞"
+              value={maxPrecio}
+              onChange={e => setParam('maxPrecio', e.target.value || null)}
+              disabled={loading}
+              className="w-full px-2 py-1.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:bg-gray-50"
+            />
+          </div>
+        </div>
+      </div>
+
+      {/* Subcategoría multi-select */}
+      <div>
+        <div className="flex items-center justify-between mb-2">
+          <p className="text-xs font-semibold text-gray-500 uppercase">Subcategoría</p>
+          {selectedCategorias.length > 0 && (
+            <button
+              onClick={() => setParam('categorias', null)}
+              className="text-xs text-blue-500 hover:underline"
+            >
+              Ver todas
+            </button>
+          )}
+        </div>
+        {loading ? (
+          <div className="space-y-1.5 animate-pulse">
+            {Array.from({ length: 5 }).map((_, i) => (
+              <div key={i} className="h-8 bg-gray-200 rounded-lg w-full" />
+            ))}
+          </div>
+        ) : subcategorias.length === 0 ? (
+          <p className="text-xs text-gray-400">Sin subcategorías</p>
+        ) : (
+          <div className="flex flex-col gap-1.5 max-h-72 overflow-y-auto pr-1">
+            {subcategorias.map(cat => {
+              const isSelected = selectedCategorias.includes(cat);
+              return (
+                <button
+                  key={cat}
+                  onClick={() => toggleCategoria(cat)}
+                  className={`flex items-center gap-2 text-left px-3 py-2 rounded-lg text-xs transition font-medium leading-snug ${
+                    isSelected
+                      ? 'bg-blue-600 text-white'
+                      : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                  }`}
+                >
+                  <span className={`flex-shrink-0 w-4 h-4 rounded border flex items-center justify-center ${
+                    isSelected ? 'border-white bg-white/20' : 'border-gray-400'
+                  }`}>
+                    {isSelected && <span className="text-white text-xs leading-none">✓</span>}
+                  </span>
+                  <span className="flex-1">{cat}</span>
+                </button>
+              );
+            })}
+          </div>
+        )}
+      </div>
+    </div>
+  );
 
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Header */}
       <header className="bg-white shadow-sm sticky top-0 z-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
-          <div className="flex justify-between items-center">
-            <Link to="/" className="flex items-center space-x-2 text-gray-700 hover:text-blue-600 transition">
-              <img src={logo} alt="Guerrmo" className="h-12 w-auto" />
-              <span className="text-lg font-medium">Ir a Inicio</span>
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3 sm:py-4">
+          <div className="flex justify-between items-center gap-3">
+            <Link to="/" className="flex items-center space-x-2 text-gray-700 hover:text-blue-600 transition shrink-0">
+              <img src={logo} alt="Guerrmo" className="h-10 sm:h-12 w-auto" />
+              <span className="hidden sm:inline text-lg font-medium">Ir a Inicio</span>
             </Link>
-            <nav className="hidden md:flex space-x-8">
-              <Link to="/" className="text-gray-700 hover:text-blue-600 font-medium">Inicio</Link>
-              <Link to="/catalogo" className="text-blue-600 font-medium">Catálogo</Link>
-              <Link to="/pedido" className="text-gray-700 hover:text-blue-600 font-medium">Mi Pedido</Link>
-              <Link to="/admin" className="text-gray-700 hover:text-blue-600 font-medium">Admin</Link>
+            <nav className="hidden md:flex space-x-6 lg:space-x-8">
+              <Link to="/" className="text-gray-700 hover:text-blue-600 font-medium text-sm lg:text-base">Inicio</Link>
+              <Link to="/catalogo" className="text-blue-600 font-medium text-sm lg:text-base">Catálogo</Link>
+              <Link to="/pedido" className="text-gray-700 hover:text-blue-600 font-medium text-sm lg:text-base">Mi Pedido</Link>
+              <Link to="/admin" className="text-gray-700 hover:text-blue-600 font-medium text-sm lg:text-base">Admin</Link>
             </nav>
-            <Link to="/pedido" className="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition">
+            <Link to="/pedido" className="bg-blue-600 text-white px-4 sm:px-6 py-2 rounded-lg hover:bg-blue-700 transition text-sm sm:text-base shrink-0">
               Ver Pedido
             </Link>
           </div>
@@ -157,43 +263,43 @@ const CategoriaProductos = () => {
 
       {/* Breadcrumb */}
       <div className="bg-white border-b">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-2 text-sm text-gray-600">
-              <Link to="/" className="hover:text-blue-600">Inicio</Link>
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-2 sm:py-3">
+          <div className="flex items-center justify-between gap-2">
+            <div className="flex items-center space-x-1 sm:space-x-2 text-xs sm:text-sm text-gray-600 min-w-0">
+              <Link to="/" className="hover:text-blue-600 shrink-0">Inicio</Link>
               <span>/</span>
-              <Link to="/catalogo" className="hover:text-blue-600">Catálogo</Link>
+              <Link to="/catalogo" className="hover:text-blue-600 shrink-0">Catálogo</Link>
               <span>/</span>
-              <span className="text-gray-900">{categoryName || 'Categoría'}</span>
+              <span className="text-gray-900 truncate">{categoryName || 'Categoría'}</span>
             </div>
             <Link
               to="/catalogo"
-              className="flex items-center gap-2 bg-gray-600 text-white hover:bg-gray-500 px-4 py-2 rounded-lg text-sm font-medium transition"
+              className="flex items-center gap-1 bg-gray-600 text-white hover:bg-gray-500 px-3 py-1.5 sm:px-4 sm:py-2 rounded-lg text-xs sm:text-sm font-medium transition shrink-0"
             >
-              ← Regresar al catálogo
+              ← <span className="hidden sm:inline">Regresar al catálogo</span><span className="sm:hidden">Catálogo</span>
             </Link>
           </div>
         </div>
       </div>
 
       {/* Page Header */}
-      <div className="bg-gray-700 text-white py-4">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center gap-6">
+      <div className="bg-gray-700 text-white py-4 sm:py-6">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center gap-4 sm:gap-6">
           {categoryImage && (
             <img
               src={categoryImage}
               alt={categoryName}
-              className="h-32 w-32 rounded-md object-cover shadow-xl border-2 border-white/90"
+              className="h-20 w-20 sm:h-28 sm:w-28 lg:h-32 lg:w-32 rounded-md object-cover shadow-xl border-2 border-white/90 shrink-0"
             />
           )}
-          <div>
-            <h1 className="text-3xl font-bold">{categoryName || 'Productos'}</h1>
+          <div className="min-w-0">
+            <h1 className="text-2xl sm:text-3xl font-bold truncate">{categoryName || 'Productos'}</h1>
             {!loading && (
-              <div className="flex items-center gap-4 mt-1">
-                <p className="text-gray-300">{products.length.toLocaleString()} productos encontrados</p>
-                <span className="text-green-400 text-sm font-medium">{inStock.toLocaleString()} en stock</span>
+              <div className="flex flex-wrap items-center gap-2 sm:gap-4 mt-1">
+                <p className="text-gray-300 text-sm">{products.length.toLocaleString()} productos</p>
+                <span className="text-green-400 text-xs sm:text-sm font-medium">{inStock.toLocaleString()} en stock</span>
                 {products.length - inStock > 0 && (
-                  <span className="text-red-400 text-sm">{(products.length - inStock).toLocaleString()} sin existencia</span>
+                  <span className="text-red-400 text-xs sm:text-sm">{(products.length - inStock).toLocaleString()} sin existencia</span>
                 )}
               </div>
             )}
@@ -201,187 +307,88 @@ const CategoriaProductos = () => {
         </div>
       </div>
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-        <div className="grid md:grid-cols-4 gap-6">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-6">
 
-          {/* ── Sidebar Filters ── */}
-          <aside className="md:col-span-1">
-            <div className="bg-white rounded-2xl shadow-sm p-5 sticky top-24 space-y-6">
-              <div className="flex items-center justify-between">
-                <h2 className="font-bold text-gray-800 text-base">Filtros</h2>
-                {activeFiltersCount > 0 && (
-                  <button
-                    onClick={clearAllFilters}
-                    className="text-xs text-red-500 hover:underline font-medium"
-                  >
-                    Limpiar ({activeFiltersCount})
-                  </button>
-                )}
-              </div>
+        {/* Mobile filter toggle */}
+        <div className="md:hidden mb-4">
+          <button
+            onClick={() => setFiltersOpen(o => !o)}
+            className="flex items-center gap-2 w-full bg-white border border-gray-200 rounded-xl px-4 py-3 text-sm font-medium text-gray-700 shadow-sm"
+          >
+            <span>⚙️ Filtros</span>
+            {activeFiltersCount > 0 && (
+              <span className="ml-1 bg-blue-600 text-white text-xs rounded-full px-2 py-0.5">{activeFiltersCount}</span>
+            )}
+            <span className="ml-auto text-gray-400">{filtersOpen ? '▲' : '▼'}</span>
+          </button>
+          {filtersOpen && (
+            <div className="mt-2 bg-white rounded-2xl shadow-sm p-5 border border-gray-100">
+              <FilterPanel />
+            </div>
+          )}
+        </div>
 
-              {/* Disponibilidad */}
-              <div>
-                <p className="text-xs font-semibold text-gray-500 uppercase mb-2">Disponibilidad</p>
-                <div className="flex flex-col gap-1.5">
-                  {[
-                    { value: 'todos', label: 'Todos' },
-                    { value: 'con', label: 'Con existencia' },
-                    { value: 'sin', label: 'Sin existencia' },
-                  ].map(opt => (
-                    <button
-                      key={opt.value}
-                      onClick={() => setParam('stock', opt.value === 'todos' ? null : opt.value)}
-                      className={`text-left px-3 py-2 rounded-lg text-sm transition font-medium ${
-                        stockFilter === opt.value
-                          ? 'bg-blue-600 text-white'
-                          : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                      }`}
-                    >
-                      {opt.value === 'con' && (
-                        <span className="inline-block w-2 h-2 rounded-full bg-green-400 mr-2" />
-                      )}
-                      {opt.value === 'sin' && (
-                        <span className="inline-block w-2 h-2 rounded-full bg-red-400 mr-2" />
-                      )}
-                      {opt.label}
-                    </button>
-                  ))}
-                </div>
-              </div>
+        <div className="grid md:grid-cols-4 gap-4 lg:gap-6">
 
-              {/* Rango de precio */}
-              <div>
-                <p className="text-xs font-semibold text-gray-500 uppercase mb-2">Rango de precio</p>
-                {!loading && products.length > 0 && (
-                  <p className="text-xs text-gray-400 mb-2">
-                    ${precioMin.toLocaleString('es-MX')} – ${precioMax.toLocaleString('es-MX')}
-                  </p>
-                )}
-                <div className="flex gap-2">
-                  <div className="flex-1">
-                    <label className="text-xs text-gray-500 mb-1 block">Mín</label>
-                    <input
-                      type="number"
-                      min="0"
-                      placeholder="0"
-                      value={minPrecio}
-                      onChange={e => setParam('minPrecio', e.target.value || null)}
-                      disabled={loading}
-                      className="w-full px-2 py-1.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:bg-gray-50"
-                    />
-                  </div>
-                  <div className="flex-1">
-                    <label className="text-xs text-gray-500 mb-1 block">Máx</label>
-                    <input
-                      type="number"
-                      min="0"
-                      placeholder="∞"
-                      value={maxPrecio}
-                      onChange={e => setParam('maxPrecio', e.target.value || null)}
-                      disabled={loading}
-                      className="w-full px-2 py-1.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:bg-gray-50"
-                    />
-                  </div>
-                </div>
-              </div>
-
-              {/* Subcategoría */}
-              <div>
-                <p className="text-xs font-semibold text-gray-500 uppercase mb-2">Subcategoría</p>
-                {loading ? (
-                  <div className="space-y-1.5 animate-pulse">
-                    {Array.from({ length: 5 }).map((_, i) => (
-                      <div key={i} className="h-8 bg-gray-200 rounded-lg w-full" />
-                    ))}
-                  </div>
-                ) : subcategorias.length === 0 ? (
-                  <p className="text-xs text-gray-400">Sin subcategorías</p>
-                ) : (
-                  <div className="flex flex-col gap-1.5 max-h-64 overflow-y-auto pr-1">
-                    {subcategorias.map(cat => (
-                      <button
-                        key={cat}
-                        onClick={() => setParam('categoria', selectedCategoria === cat ? null : cat)}
-                        className={`text-left px-3 py-2 rounded-lg text-xs transition font-medium leading-snug ${
-                          selectedCategoria === cat
-                            ? 'bg-blue-600 text-white'
-                            : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                        }`}
-                      >
-                        {cat}
-                      </button>
-                    ))}
-                  </div>
-                )}
-              </div>
+          {/* ── Sidebar Filters (tablet+) ── */}
+          <aside className="hidden md:block md:col-span-1">
+            <div className="bg-white rounded-2xl shadow-sm p-5 sticky top-24">
+              <FilterPanel />
             </div>
           </aside>
 
           {/* ── Main content ── */}
           <div className="md:col-span-3">
-            <div className="bg-white rounded-2xl shadow-md p-6">
+            <div className="bg-white rounded-2xl shadow-md p-4 sm:p-6">
+
               {/* Toolbar: search + sort */}
-              <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 mb-5">
-                <div className="relative flex-1 w-full sm:max-w-lg">
+              <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 mb-4">
+                <div className="relative flex-1">
                   <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm">🔍</span>
                   <input
                     type="text"
-                    placeholder="Buscar por clave, descripción, categoría..."
+                    placeholder="Buscar por clave, descripción..."
                     value={search}
                     onChange={e => setParam('q', e.target.value || null)}
                     disabled={loading}
-                    className="w-full pl-9 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm disabled:bg-gray-50 disabled:text-gray-400"
+                    className="w-full pl-9 pr-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm disabled:bg-gray-50 disabled:text-gray-400"
                   />
                 </div>
-
-                <div className="flex items-center gap-3 shrink-0">
+                <div className="flex items-center gap-2 sm:gap-3 shrink-0">
                   <select
                     value={sortBy}
                     onChange={e => setParam('sort', e.target.value === 'relevancia' ? null : e.target.value)}
                     disabled={loading}
-                    className="px-3 py-2 border border-gray-300 rounded-lg text-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:bg-gray-50 disabled:text-gray-400"
+                    className="flex-1 sm:flex-none px-3 py-2.5 border border-gray-300 rounded-lg text-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:bg-gray-50"
                   >
-                    <option value="relevancia">Ordenar: Relevancia</option>
-                    <option value="precio-asc">Precio: Menor a Mayor</option>
-                    <option value="precio-desc">Precio: Mayor a Menor</option>
-                    <option value="existencia">Mayor Existencia</option>
+                    <option value="relevancia">Relevancia</option>
+                    <option value="precio-asc">Precio ↑</option>
+                    <option value="precio-desc">Precio ↓</option>
+                    <option value="existencia">Existencia</option>
                   </select>
-
                   {!loading && (
                     <span className="text-sm text-gray-500 whitespace-nowrap">
-                      {sorted.length} de {products.length}
+                      {sorted.length}<span className="hidden sm:inline"> de {products.length}</span>
                     </span>
                   )}
                 </div>
               </div>
 
               {/* Active filter chips */}
-              {!loading && (selectedCategoria || stockFilter !== 'todos' || minPrecio || maxPrecio) && (
+              {!loading && (selectedCategorias.length > 0 || minPrecio || maxPrecio) && (
                 <div className="flex flex-wrap gap-2 mb-4">
-                  {stockFilter === 'con' && (
-                    <span className="inline-flex items-center gap-1 px-3 py-1 bg-green-100 text-green-700 text-xs rounded-full font-medium">
-                      Con existencia
-                      <button onClick={() => setParam('stock', null)} className="ml-1 hover:text-green-900">✕</button>
+                  {selectedCategorias.map(cat => (
+                    <span key={cat} className="inline-flex items-center gap-1 px-2.5 py-1 bg-blue-100 text-blue-700 text-xs rounded-full font-medium">
+                      {cat}
+                      <button onClick={() => toggleCategoria(cat)} className="ml-0.5 hover:text-blue-900 font-bold">✕</button>
                     </span>
-                  )}
-                  {stockFilter === 'sin' && (
-                    <span className="inline-flex items-center gap-1 px-3 py-1 bg-red-100 text-red-600 text-xs rounded-full font-medium">
-                      Sin existencia
-                      <button onClick={() => setParam('stock', null)} className="ml-1 hover:text-red-900">✕</button>
-                    </span>
-                  )}
-                  {selectedCategoria && (
-                    <span className="inline-flex items-center gap-1 px-3 py-1 bg-blue-100 text-blue-700 text-xs rounded-full font-medium">
-                      {selectedCategoria}
-                      <button onClick={() => setParam('categoria', null)} className="ml-1 hover:text-blue-900">✕</button>
-                    </span>
-                  )}
+                  ))}
                   {(minPrecio || maxPrecio) && (
-                    <span className="inline-flex items-center gap-1 px-3 py-1 bg-purple-100 text-purple-700 text-xs rounded-full font-medium">
-                      Precio: ${minPrecio || '0'} – ${maxPrecio || '∞'}
+                    <span className="inline-flex items-center gap-1 px-2.5 py-1 bg-purple-100 text-purple-700 text-xs rounded-full font-medium">
+                      ${minPrecio || '0'} – ${maxPrecio || '∞'}
                       <button
                         onClick={() => { setParam('minPrecio', null); setParam('maxPrecio', null); }}
-                        className="ml-1 hover:text-purple-900"
+                        className="ml-0.5 hover:text-purple-900 font-bold"
                       >✕</button>
                     </span>
                   )}
@@ -393,13 +400,13 @@ const CategoriaProductos = () => {
                 <table className="w-full text-sm">
                   <thead className="bg-gray-50 text-gray-500 uppercase text-xs">
                     <tr>
-                      <th className="px-4 py-3 text-left">Clave</th>
-                      <th className="px-4 py-3 text-left">Descripción</th>
-                      <th className="px-4 py-3 text-left">Categoría</th>
-                      <th className="px-4 py-3 text-left">Características</th>
-                      <th className="px-4 py-3 text-right">Precio</th>
-                      <th className="px-4 py-3 text-right">Existencia</th>
-                      <th className="px-4 py-3"></th>
+                      <th className="px-3 sm:px-4 py-3 text-left">Clave</th>
+                      <th className="px-3 sm:px-4 py-3 text-left">Descripción</th>
+                      <th className="px-3 sm:px-4 py-3 text-left hidden md:table-cell">Categoría</th>
+                      <th className="px-3 sm:px-4 py-3 text-left hidden lg:table-cell">Características</th>
+                      <th className="px-3 sm:px-4 py-3 text-right">Precio</th>
+                      <th className="px-3 sm:px-4 py-3 text-right hidden sm:table-cell">Existencia</th>
+                      <th className="px-3 sm:px-4 py-3"></th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-gray-100">
@@ -410,10 +417,7 @@ const CategoriaProductos = () => {
                         <td colSpan="7" className="px-4 py-12 text-center">
                           <p className="text-gray-400 text-base">No se encontraron productos</p>
                           {(search || activeFiltersCount > 0) && (
-                            <button
-                              onClick={clearAllFilters}
-                              className="mt-2 text-blue-600 text-sm hover:underline"
-                            >
+                            <button onClick={clearAllFilters} className="mt-2 text-blue-600 text-sm hover:underline">
                               Limpiar filtros
                             </button>
                           )}
@@ -422,25 +426,39 @@ const CategoriaProductos = () => {
                     ) : (
                       sorted.map((product, index) => {
                         const enStock = Number(product.existencia) > 0;
+                        const catSelected = selectedCategorias.includes(product.categoria);
                         return (
                           <tr
                             key={product.clave + index}
                             className={`hover:bg-blue-50 transition ${!enStock ? 'opacity-60' : ''}`}
                           >
-                            <td className="px-4 py-3 whitespace-nowrap">
+                            <td className="px-3 sm:px-4 py-3 whitespace-nowrap">
                               <span className="font-mono text-gray-700 text-xs">{product.clave}</span>
                               {product.claveAlterna && product.claveAlterna !== product.clave && (
                                 <p className="font-mono text-gray-400 text-xs mt-0.5">{product.claveAlterna}</p>
                               )}
                             </td>
-                            <td className="px-4 py-3 text-gray-900 font-medium max-w-xs">
-                              {product.descripcion}
+                            <td className="px-3 sm:px-4 py-3 text-gray-900 font-medium">
+                              <span className="line-clamp-2 sm:line-clamp-none">{product.descripcion}</span>
+                              {/* Show category inline on mobile (hidden md) */}
+                              {product.categoria && (
+                                <button
+                                  onClick={() => toggleCategoria(product.categoria)}
+                                  className={`md:hidden mt-1 px-2 py-0.5 rounded-full text-xs font-medium transition ${
+                                    catSelected
+                                      ? 'bg-blue-600 text-white'
+                                      : 'bg-gray-100 text-gray-500 hover:bg-blue-100 hover:text-blue-700'
+                                  }`}
+                                >
+                                  {product.categoria}
+                                </button>
+                              )}
                             </td>
-                            <td className="px-4 py-3 whitespace-nowrap text-xs">
+                            <td className="px-3 sm:px-4 py-3 hidden md:table-cell whitespace-nowrap text-xs">
                               <button
-                                onClick={() => setParam('categoria', selectedCategoria === product.categoria ? null : product.categoria)}
+                                onClick={() => toggleCategoria(product.categoria)}
                                 className={`px-2 py-0.5 rounded-full text-xs font-medium transition ${
-                                  selectedCategoria === product.categoria
+                                  catSelected
                                     ? 'bg-blue-600 text-white'
                                     : 'bg-gray-100 text-gray-500 hover:bg-blue-100 hover:text-blue-700'
                                 }`}
@@ -448,27 +466,27 @@ const CategoriaProductos = () => {
                                 {product.categoria}
                               </button>
                             </td>
-                            <td className="px-4 py-3 text-gray-500 text-xs max-w-xs">{product.caracteristicas}</td>
-                            <td className="px-4 py-3 text-right font-bold text-blue-600 whitespace-nowrap">
+                            <td className="px-3 sm:px-4 py-3 text-gray-500 text-xs hidden lg:table-cell max-w-xs">{product.caracteristicas}</td>
+                            <td className="px-3 sm:px-4 py-3 text-right font-bold text-blue-600 whitespace-nowrap text-xs sm:text-sm">
                               ${Number(product.precio).toLocaleString('es-MX', { minimumFractionDigits: 2 })}
                             </td>
-                            <td className="px-4 py-3 text-right">
+                            <td className="px-3 sm:px-4 py-3 text-right hidden sm:table-cell">
                               {enStock ? (
-                                <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold bg-green-100 text-green-700">
+                                <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold bg-green-100 text-green-700 whitespace-nowrap">
                                   {Number(product.existencia).toLocaleString()} pzas
                                 </span>
                               ) : (
-                                <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold bg-red-100 text-red-600">
-                                  Sin existencia
+                                <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold bg-red-100 text-red-600 whitespace-nowrap">
+                                  Sin stock
                                 </span>
                               )}
                             </td>
-                            <td className="px-4 py-3 text-center">
+                            <td className="px-3 sm:px-4 py-3 text-center">
                               <Link
                                 to={`/producto/${product.clave}`}
-                                className="bg-gray-700 text-white px-3 py-1.5 rounded-lg hover:bg-gray-900 transition text-xs font-semibold whitespace-nowrap"
+                                className="bg-gray-700 text-white px-2.5 sm:px-3 py-1.5 rounded-lg hover:bg-gray-900 transition text-xs font-semibold whitespace-nowrap"
                               >
-                                Ver detalle
+                                Ver →
                               </Link>
                             </td>
                           </tr>
