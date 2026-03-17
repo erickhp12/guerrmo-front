@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { mockProducts } from '../../mockData';
 import logo from '../../assets/img/miniLogo.png';
 import config from '../../config.js';
+import SearchBar from '../../components/SearchBar';
 
 const Home = () => {
   const featuredProducts = mockProducts.slice(0, 6);
@@ -78,15 +79,9 @@ const Home = () => {
             </div>
             <div className="hidden md:block">
               <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-8">
-                <div className="bg-white rounded-lg p-6">
-                  <input 
-                    type="text" 
-                    placeholder="Busca tu refacción: balatas, filtros, baterías..." 
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  />
-                  <button className="w-full mt-4 bg-red-600 text-white py-3 rounded-lg font-semibold hover:bg-red-700 transition">
-                    Buscar
-                  </button>
+                <div className="bg-white rounded-lg p-4">
+                  <p className="text-gray-700 font-semibold mb-3 text-sm">Busca tu refacción</p>
+                  <SearchBar placeholder="Balatas, filtros, baterías, bujías..." />
                 </div>
               </div>
             </div>

@@ -3,6 +3,15 @@ import { Link, useParams, useLocation, useHistory } from 'react-router-dom';
 import logo from '../../assets/img/miniLogo.png';
 import config from '../../config.js';
 
+const useDebounce = (value, delay = 300) => {
+  const [debounced, setDebounced] = useState(value);
+  useEffect(() => {
+    const t = setTimeout(() => setDebounced(value), delay);
+    return () => clearTimeout(t);
+  }, [value, delay]);
+  return debounced;
+};
+
 const SkeletonRow = () => (
   <tr className="animate-pulse">
     <td className="px-4 py-3"><div className="h-4 bg-gray-200 rounded w-24" /></td>
@@ -55,6 +64,7 @@ const CategoriaProductos = () => {
 
   // Filters from URL
   const search = getParam('q', '');
+  const debouncedSearch = useDebounce(search, 300);
   const sortBy = getParam('sort', 'relevancia');
   const selectedCategorias = getParamArray('categorias'); // multi-select array
   const minPrecio = getParam('minPrecio', '');
@@ -104,7 +114,7 @@ const CategoriaProductos = () => {
   const filtered = useMemo(() => {
     return products.filter(p => {
       const matchSearch = [p.clave, p.claveAlterna, p.descripcion, p.categoria, p.caracteristicas]
-        .some(f => f?.toLowerCase().includes(search.toLowerCase()));
+        .some(f => f?.toLowerCase().includes(debouncedSearch.toLowerCase()));
       if (!matchSearch) return false;
 
       if (selectedCategorias.length > 0 && !selectedCategorias.includes(p.categoria)) return false;
@@ -115,7 +125,7 @@ const CategoriaProductos = () => {
 
       return true;
     });
-  }, [products, search, selectedCategorias, minPrecio, maxPrecio]);
+  }, [products, debouncedSearch, selectedCategorias, minPrecio, maxPrecio]);
 
   const sorted = useMemo(() => {
     return [...filtered].sort((a, b) => {
