@@ -3,6 +3,7 @@ import { Link, useLocation, useHistory } from 'react-router-dom';
 import logo from '../../assets/img/miniLogo.png';
 import config from '../../config.js';
 import SearchBar from '../../components/SearchBar';
+import Navbar from '../../components/Navbar';
 
 const SkeletonRow = () => (
   <tr className="animate-pulse">
@@ -59,26 +60,7 @@ const BuscarResultados = () => {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Header */}
-      <header className="bg-white shadow-sm sticky top-0 z-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3 sm:py-4">
-          <div className="flex justify-between items-center gap-3">
-            <Link to="/" className="flex items-center space-x-2 text-gray-700 hover:text-blue-600 transition shrink-0">
-              <img src={logo} alt="Guerrmo" className="h-10 sm:h-12 w-auto" />
-              <span className="hidden sm:inline text-lg font-medium">Guerrmo</span>
-            </Link>
-            <nav className="hidden md:flex space-x-6 lg:space-x-8">
-              <Link to="/" className="text-gray-700 hover:text-blue-600 font-medium text-sm lg:text-base">Inicio</Link>
-              <Link to="/catalogo" className="text-gray-700 hover:text-blue-600 font-medium text-sm lg:text-base">Catálogo</Link>
-              <Link to="/pedido" className="text-gray-700 hover:text-blue-600 font-medium text-sm lg:text-base">Mi Pedido</Link>
-              <Link to="/admin" className="text-gray-700 hover:text-blue-600 font-medium text-sm lg:text-base">Admin</Link>
-            </nav>
-            <Link to="/pedido" className="bg-blue-600 text-white px-4 sm:px-6 py-2 rounded-lg hover:bg-blue-700 transition text-sm sm:text-base shrink-0">
-              Ver Pedido
-            </Link>
-          </div>
-        </div>
-      </header>
+      <Navbar />
 
       {/* Search bar section */}
       <div className="bg-gray-700 py-5 sm:py-8">
@@ -207,7 +189,7 @@ const BuscarResultados = () => {
                           <td className="px-3 sm:px-4 py-3 text-center">
                             <Link
                               to={`/producto/${product.clave}`}
-                              className="bg-gray-700 text-white px-2.5 sm:px-3 py-1.5 rounded-lg hover:bg-gray-900 transition text-xs font-semibold whitespace-nowrap"
+                              className="bg-gray-700 text-white px-3 py-2.5 rounded-lg hover:bg-gray-900 transition text-xs font-semibold whitespace-nowrap min-h-[44px] flex items-center"
                             >
                               Ver →
                             </Link>

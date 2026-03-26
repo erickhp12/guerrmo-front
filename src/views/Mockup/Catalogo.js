@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import logo from '../../assets/img/miniLogo.png';
+const noImage = 'https://guerrmo-store.s3.us-east-1.amazonaws.com/general/no-image.svg';
 import config from '../../config.js';
+import Navbar from '../../components/Navbar';
 
 const Catalogo = () => {
   const [searchTerm, setSearchTerm] = useState('');
@@ -36,26 +38,7 @@ const Catalogo = () => {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Header */}
-      <header className="bg-white shadow-sm sticky top-0 z-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
-          <div className="flex justify-between items-center">
-            <Link to="/" className="flex items-center space-x-2 text-gray-700 hover:text-blue-600 transition">
-              <img src={logo} alt="Guerrmo" className="h-12 w-auto" />
-              <span className="text-lg font-medium">Ir a Inicio</span>
-            </Link>
-            <nav className="hidden md:flex space-x-8">
-              <Link to="/" className="text-gray-700 hover:text-blue-600 font-medium">Inicio</Link>
-              <Link to="/catalogo" className="text-blue-600 font-medium">Catálogo</Link>
-              <Link to="/pedido" className="text-gray-700 hover:text-blue-600 font-medium">Mi Pedido</Link>
-              <Link to="/admin" className="text-gray-700 hover:text-blue-600 font-medium">Admin</Link>
-            </nav>
-            <Link to="/pedido" className="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition">
-              Ver Pedido
-            </Link>
-          </div>
-        </div>
-      </header>
+      <Navbar />
 
       {/* Page Header */}
       <div className="bg-gray-700 text-white py-12">
@@ -69,7 +52,7 @@ const Catalogo = () => {
         <div className="grid md:grid-cols-4 gap-8">
           {/* Sidebar Filters */}
           <div className="md:col-span-1">
-            <div className="bg-white rounded-xl shadow-sm p-6 sticky top-24">
+            <div className="bg-white rounded-xl shadow-sm p-6 md:sticky md:top-24">
               
               {/* Search */}
               <div className="mb-6">
@@ -152,19 +135,14 @@ const Catalogo = () => {
               <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {displayCategories.map(cat => (
                   <div key={cat.id} className="bg-white rounded-xl shadow-sm hover:shadow-lg transition overflow-hidden group">
-                    {cat.imagen ? (
-                      <div className="w-full h-48 overflow-hidden">
-                        <img
-                          src={cat.imagen}
-                          alt={cat.departamento}
-                          className="w-full h-48 object-cover group-hover:scale-105 transition duration-300"
-                        />
-                      </div>
-                    ) : (
-                      <div className="w-full h-48 bg-gradient-to-br from-gray-100 to-gray-200 flex items-center justify-center">
-                        <span className="text-5xl text-gray-300">🔧</span>
-                      </div>
-                    )}
+                    <div className="w-full h-48 overflow-hidden">
+                      <img
+                        src={cat.imagen || noImage}
+                        alt={cat.departamento}
+                        className="w-full h-48 object-cover group-hover:scale-105 transition duration-300"
+                        onError={e => { e.target.src = noImage; }}
+                      />
+                    </div>
                     <div className="p-5">
                       <h3 className="font-bold text-lg text-gray-900">{cat.departamento}</h3>
                       <div className="flex items-center gap-2 mt-2">

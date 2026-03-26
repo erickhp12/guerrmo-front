@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import logo from '../../assets/img/miniLogo.png';
+const noImage = 'https://guerrmo-store.s3.us-east-1.amazonaws.com/general/no-image.svg';
 import config from '../../config.js';
+import Navbar from '../../components/Navbar';
 
 const ProductoDetalle = () => {
   const { id } = useParams();
@@ -56,37 +58,18 @@ const ProductoDetalle = () => {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Header */}
-      <header className="bg-white shadow-sm sticky top-0 z-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
-          <div className="flex justify-between items-center">
-            <Link to="/" className="flex items-center space-x-2 text-gray-700 hover:text-blue-600 transition">
-              <img src={logo} alt="Guerrmo" className="h-12 w-auto" />
-              <span className="text-lg font-medium">Ir a Inicio</span>
-            </Link>
-            <nav className="hidden md:flex space-x-8">
-              <Link to="/" className="text-gray-700 hover:text-blue-600 font-medium">Inicio</Link>
-              <Link to="/catalogo" className="text-gray-700 hover:text-blue-600 font-medium">Catálogo</Link>
-              <Link to="/pedido" className="text-gray-700 hover:text-blue-600 font-medium">Mi Pedido</Link>
-              <Link to="/admin" className="text-gray-700 hover:text-blue-600 font-medium">Admin</Link>
-            </nav>
-            <Link to="/pedido" className="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition">
-              Ver Pedido
-            </Link>
-          </div>
-        </div>
-      </header>
+      <Navbar />
 
       {/* Breadcrumb */}
       <div className="bg-white border-b">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-2 text-sm text-gray-600">
-              <Link to="/" className="hover:text-blue-600">Inicio</Link>
-              <span>/</span>
-              <Link to="/catalogo" className="hover:text-blue-600">Catálogo</Link>
-              <span>/</span>
-              <span className="text-gray-900">{product.descripcion}</span>
+          <div className="flex items-center justify-between gap-3">
+            <div className="flex items-center space-x-2 text-sm text-gray-600 min-w-0">
+              <Link to="/" className="hover:text-blue-600 shrink-0">Inicio</Link>
+              <span className="shrink-0">/</span>
+              <Link to="/catalogo" className="hover:text-blue-600 shrink-0">Catálogo</Link>
+              <span className="shrink-0">/</span>
+              <span className="text-gray-900 truncate">{product.descripcion}</span>
             </div>
             <Link
               to="/catalogo"
@@ -148,22 +131,22 @@ const ProductoDetalle = () => {
               <div className="flex items-center gap-4">
                 <label className="font-medium text-gray-700">Cantidad:</label>
                 <div className="flex items-center border border-gray-300 rounded-lg">
-                  <button onClick={() => setQuantity(Math.max(1, quantity - 1))} className="px-4 py-2 hover:bg-gray-100">-</button>
-                  <span className="px-6 py-2 border-x border-gray-300">{quantity}</span>
-                  <button onClick={() => setQuantity(quantity + 1)} className="px-4 py-2 hover:bg-gray-100">+</button>
+                  <button onClick={() => setQuantity(Math.max(1, quantity - 1))} className="px-4 py-3 hover:bg-gray-100 min-w-[44px] min-h-[44px] flex items-center justify-center">-</button>
+                  <span className="px-6 py-3 border-x border-gray-300">{quantity}</span>
+                  <button onClick={() => setQuantity(quantity + 1)} className="px-4 py-3 hover:bg-gray-100 min-w-[44px] min-h-[44px] flex items-center justify-center">+</button>
                 </div>
               </div>
 
-              <div className="flex gap-4">
+              <div className="flex flex-col sm:flex-row gap-3">
                 <button
                   onClick={addToCart}
-                  className="flex-1 bg-red-600 text-white px-8 py-4 rounded-lg hover:bg-red-700 transition font-semibold text-lg"
+                  className="flex-1 bg-red-600 text-white px-8 py-4 rounded-lg hover:bg-red-700 active:scale-95 transition-all font-semibold text-lg"
                 >
                   {added ? '✓ Agregado al pedido' : 'Agregar al pedido'}
                 </button>
                 <Link
                   to="/pedido"
-                  className="bg-gray-800 text-white px-8 py-4 rounded-lg hover:bg-gray-900 transition font-semibold text-lg"
+                  className="flex-1 sm:flex-none bg-gray-800 text-white px-8 py-4 rounded-lg hover:bg-gray-900 active:scale-95 transition-all font-semibold text-lg text-center"
                 >
                   Ver pedido
                 </Link>

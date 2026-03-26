@@ -1,7 +1,9 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { Link, useParams, useLocation, useHistory } from 'react-router-dom';
 import logo from '../../assets/img/miniLogo.png';
+const noImage = 'https://guerrmo-store.s3.us-east-1.amazonaws.com/general/no-image.svg';
 import config from '../../config.js';
+import Navbar from '../../components/Navbar';
 
 const useDebounce = (value, delay = 300) => {
   const [debounced, setDebounced] = useState(value);
@@ -227,7 +229,7 @@ const CategoriaProductos = () => {
                 <button
                   key={cat}
                   onClick={() => toggleCategoria(cat)}
-                  className={`flex items-center gap-2 text-left px-3 py-2 rounded-lg text-xs transition font-medium leading-snug ${
+                  className={`flex items-center gap-2 text-left px-3 py-3 rounded-lg text-xs transition font-medium leading-snug min-h-[44px] ${
                     isSelected
                       ? 'bg-blue-600 text-white'
                       : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
@@ -250,26 +252,7 @@ const CategoriaProductos = () => {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Header */}
-      <header className="bg-white shadow-sm sticky top-0 z-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3 sm:py-4">
-          <div className="flex justify-between items-center gap-3">
-            <Link to="/" className="flex items-center space-x-2 text-gray-700 hover:text-blue-600 transition shrink-0">
-              <img src={logo} alt="Guerrmo" className="h-10 sm:h-12 w-auto" />
-              <span className="hidden sm:inline text-lg font-medium">Ir a Inicio</span>
-            </Link>
-            <nav className="hidden md:flex space-x-6 lg:space-x-8">
-              <Link to="/" className="text-gray-700 hover:text-blue-600 font-medium text-sm lg:text-base">Inicio</Link>
-              <Link to="/catalogo" className="text-blue-600 font-medium text-sm lg:text-base">Catálogo</Link>
-              <Link to="/pedido" className="text-gray-700 hover:text-blue-600 font-medium text-sm lg:text-base">Mi Pedido</Link>
-              <Link to="/admin" className="text-gray-700 hover:text-blue-600 font-medium text-sm lg:text-base">Admin</Link>
-            </nav>
-            <Link to="/pedido" className="bg-blue-600 text-white px-4 sm:px-6 py-2 rounded-lg hover:bg-blue-700 transition text-sm sm:text-base shrink-0">
-              Ver Pedido
-            </Link>
-          </div>
-        </div>
-      </header>
+      <Navbar />
 
       {/* Breadcrumb */}
       <div className="bg-white border-b">
@@ -295,13 +278,12 @@ const CategoriaProductos = () => {
       {/* Page Header */}
       <div className="bg-gray-700 text-white py-4 sm:py-6">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center gap-4 sm:gap-6">
-          {categoryImage && (
-            <img
-              src={categoryImage}
-              alt={categoryName}
-              className="h-20 w-20 sm:h-28 sm:w-28 lg:h-32 lg:w-32 rounded-md object-cover shadow-xl border-2 border-white/90 shrink-0"
-            />
-          )}
+          <img
+            src={categoryImage || noImage}
+            alt={categoryName || 'Categoría'}
+            className="h-20 w-20 sm:h-28 sm:w-28 lg:h-32 lg:w-32 rounded-md object-cover shadow-xl border-2 border-white/90 shrink-0"
+            onError={e => { e.target.src = noImage; }}
+          />
           <div className="min-w-0">
             <h1 className="text-2xl sm:text-3xl font-bold truncate">{categoryName || 'Productos'}</h1>
             {!loading && (
@@ -494,7 +476,7 @@ const CategoriaProductos = () => {
                             <td className="px-3 sm:px-4 py-3 text-center">
                               <Link
                                 to={`/producto/${product.clave}`}
-                                className="bg-gray-700 text-white px-2.5 sm:px-3 py-1.5 rounded-lg hover:bg-gray-900 transition text-xs font-semibold whitespace-nowrap"
+                                className="bg-gray-700 text-white px-3 py-2.5 rounded-lg hover:bg-gray-900 transition text-xs font-semibold whitespace-nowrap min-h-[44px] flex items-center"
                               >
                                 Ver →
                               </Link>

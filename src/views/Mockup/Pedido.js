@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-
 import logo from '../../assets/img/miniLogo.png';
+const noImage = 'https://guerrmo-store.s3.us-east-1.amazonaws.com/general/no-image.svg';
+import Navbar from '../../components/Navbar';
 const Pedido = () => {
   const [cart, setCart] = useState([]);
   const [formData, setFormData] = useState({
@@ -45,18 +46,7 @@ const Pedido = () => {
   if (submitted) {
     return (
       <div className="min-h-screen bg-gray-50">
-        <header className="bg-white shadow-sm">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
-            <div className="flex justify-between items-center">
-              <Link to="/" className="flex items-center space-x-2">
-                <div className="w-10 h-10 bg-red-600 rounded-lg flex items-center justify-center">
-                  <span className="text-white font-bold text-xl">G</span>
-                </div>
-                <span className="text-lg font-medium"> Inicio</span>
-              </Link>
-            </div>
-          </div>
-        </header>
+        <Navbar />
 
         <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
           <div className="bg-white rounded-2xl shadow-lg p-12 text-center">
@@ -91,25 +81,7 @@ const Pedido = () => {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Header */}
-      <header className="bg-white shadow-sm sticky top-0 z-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
-          <div className="flex justify-between items-center">
-            <Link to="/" className="flex items-center space-x-2">
-              <div className="w-10 h-10 bg-red-600 rounded-lg flex items-center justify-center">
-                <span className="text-white font-bold text-xl">G</span>
-              </div>
-              <span className="text-lg font-medium"> Inicio</span>
-            </Link>
-            <nav className="hidden md:flex space-x-8">
-              <Link to="/" className="text-gray-700 hover:text-blue-600 font-medium">Inicio</Link>
-              <Link to="/catalogo" className="text-gray-700 hover:text-blue-600 font-medium">Catálogo</Link>
-              <Link to="/pedido" className="text-blue-600 font-medium">Mi Pedido</Link>
-              <Link to="/admin" className="text-gray-700 hover:text-blue-600 font-medium">Admin</Link>
-            </nav>
-          </div>
-        </div>
-      </header>
+      <Navbar />
 
       {/* Page Header */}
       <div className="bg-gradient-to-r from-red-600 to-red-700 text-white py-12">
@@ -137,32 +109,37 @@ const Pedido = () => {
                 <h2 className="text-2xl font-bold text-gray-900 mb-6">Productos en tu pedido</h2>
                 <div className="space-y-4">
                   {cart.map(item => (
-                    <div key={item.id} className="flex gap-4 p-4 border border-gray-200 rounded-xl">
-                      <img src={item.image} alt={item.name} className="w-24 h-24 object-cover rounded-lg" />
-                      <div className="flex-1">
-                        <h3 className="font-bold text-lg text-gray-900">{item.name}</h3>
+                    <div key={item.id} className="flex gap-3 p-4 border border-gray-200 rounded-xl">
+                      <img
+                        src={item.image || noImage}
+                        alt={item.name || 'Producto'}
+                        className="w-20 h-20 sm:w-24 sm:h-24 object-cover rounded-lg shrink-0"
+                        onError={e => { e.target.src = noImage; }}
+                      />
+                      <div className="flex-1 min-w-0">
+                        <h3 className="font-bold text-base sm:text-lg text-gray-900 truncate">{item.name}</h3>
                         <p className="text-sm text-gray-600">{item.brand}</p>
                         <p className="text-sm text-gray-500">SKU: {item.sku}</p>
-                        <p className="text-lg font-bold text-blue-600 mt-2">${item.price}</p>
+                        <p className="text-lg font-bold text-blue-600 mt-1">${item.price}</p>
                       </div>
-                      <div className="flex flex-col justify-between items-end">
+                      <div className="flex flex-col justify-between items-end shrink-0">
                         <button
                           onClick={() => removeItem(item.id)}
-                          className="text-blue-600 hover:text-blue-700 text-sm font-medium"
+                          className="text-blue-600 hover:text-blue-700 text-sm font-medium min-h-[44px] flex items-center"
                         >
                           Eliminar
                         </button>
                         <div className="flex items-center border border-gray-300 rounded-lg">
-                          <button 
+                          <button
                             onClick={() => updateQuantity(item.id, item.quantity - 1)}
-                            className="px-3 py-1 hover:bg-gray-100"
+                            className="px-3 py-2.5 hover:bg-gray-100 min-w-[44px] min-h-[44px] flex items-center justify-center"
                           >
                             -
                           </button>
-                          <span className="px-4 py-1 border-x border-gray-300">{item.quantity}</span>
-                          <button 
+                          <span className="px-4 py-2.5 border-x border-gray-300">{item.quantity}</span>
+                          <button
                             onClick={() => updateQuantity(item.id, item.quantity + 1)}
-                            className="px-3 py-1 hover:bg-gray-100"
+                            className="px-3 py-2.5 hover:bg-gray-100 min-w-[44px] min-h-[44px] flex items-center justify-center"
                           >
                             +
                           </button>
@@ -200,7 +177,7 @@ const Pedido = () => {
                       required
                       value={formData.name}
                       onChange={(e) => setFormData({...formData, name: e.target.value})}
-                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                       placeholder="Juan Pérez"
                     />
                   </div>
@@ -214,7 +191,7 @@ const Pedido = () => {
                       required
                       value={formData.phone}
                       onChange={(e) => setFormData({...formData, phone: e.target.value})}
-                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                       placeholder="442-123-4567"
                     />
                   </div>
@@ -228,7 +205,7 @@ const Pedido = () => {
                       required
                       value={formData.email}
                       onChange={(e) => setFormData({...formData, email: e.target.value})}
-                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                       placeholder="correo@ejemplo.com"
                     />
                   </div>
@@ -241,7 +218,7 @@ const Pedido = () => {
                       required
                       value={formData.address}
                       onChange={(e) => setFormData({...formData, address: e.target.value})}
-                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                       rows="3"
                       placeholder="Calle, número, colonia, ciudad"
                     />
@@ -254,7 +231,7 @@ const Pedido = () => {
                     <textarea
                       value={formData.comments}
                       onChange={(e) => setFormData({...formData, comments: e.target.value})}
-                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                       rows="2"
                       placeholder="Horario preferido, referencias, etc."
                     />
