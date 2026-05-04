@@ -1,13 +1,13 @@
 import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useHistory } from 'react-router-dom';
 import logo from '../../assets/img/miniLogo.png';
 const noImage = 'https://guerrmo-store.s3.us-east-1.amazonaws.com/general/no-image.svg';
 import config from '../../config.js';
 import Navbar from '../../components/Navbar';
 
 const Catalogo = () => {
+  const history = useHistory();
   const [searchTerm, setSearchTerm] = useState('');
-  const [selectedCategory, setSelectedCategory] = useState('Todas');
   const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(true);
   const [totalProducts, setTotalProducts] = useState(0);
@@ -28,20 +28,16 @@ const Catalogo = () => {
       });
   }, []);
 
-  const filteredCategories = categories.filter(cat =>
+  const displayCategories = categories.filter(cat =>
     cat.departamento.toLowerCase().includes(searchTerm.toLowerCase())
   );
-
-  const displayCategories = selectedCategory === 'Todas' 
-    ? filteredCategories 
-    : filteredCategories.filter(cat => cat.departamento === selectedCategory);
 
   return (
     <div className="min-h-screen bg-gray-50">
       <Navbar />
 
       {/* Page Header */}
-      <div className="bg-gray-700 text-white py-12">
+      <div className="bg-gradient-to-r from-slate-900 to-slate-400 text-white py-12">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <h1 className="text-4xl font-bold mb-4">Catálogo de Refacciones</h1>
           <p className="text-gray-200">Encuentra las mejores refacciones para tu vehículo en Ciudad Juárez</p>
@@ -66,7 +62,7 @@ const Catalogo = () => {
                 />
               </div>
 
-              {/* Categories */}
+              {/* Categories — tap to navigate */}
               <div>
                 <label className="block text-lg font-medium text-gray-700 mb-2">Categorías</label>
                 {loading ? (
@@ -76,29 +72,16 @@ const Catalogo = () => {
                     ))}
                   </div>
                 ) : (
-                  <div className="space-y-2 max-h-full overflow-y-auto">
-                    <button
-                      onClick={() => setSelectedCategory('Todas')}
-                      className={`w-full text-left px-4 py-2 rounded-lg transition ${
-                        selectedCategory === 'Todas' 
-                          ? 'bg-blue-600 text-white' 
-                          : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                      }`}
-                    >
-                      Todas ({totalProducts?.toLocaleString()})
-                    </button>
-                    {categories.map(cat => (
-                      <button
+                  <div className="space-y-2 max-h-[70vh] overflow-y-auto pr-1">
+                    {displayCategories.map(cat => (
+                      <Link
                         key={cat.id}
-                        onClick={() => setSelectedCategory(cat.departamento)}
-                        className={`w-full text-left px-4 py-2 rounded-lg transition ${
-                          selectedCategory === cat.departamento 
-                            ? 'bg-blue-600 text-white' 
-                            : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                        }`}
+                        to={`/categoria/${cat.id}`}
+                        className="flex items-center justify-between w-full text-left px-4 py-2.5 rounded-lg bg-gray-100 text-gray-700 hover:bg-red-600 hover:text-white transition font-medium text-sm"
                       >
-                        {cat.departamento} ({cat.total?.toLocaleString()})
-                      </button>
+                        <span className="truncate">{cat.departamento}</span>
+                        <span className="ml-2 text-xs opacity-70 shrink-0">{cat.total?.toLocaleString()}</span>
+                      </Link>
                     ))}
                   </div>
                 )}
@@ -108,12 +91,6 @@ const Catalogo = () => {
 
           {/* Categories Grid */}
           <div className="md:col-span-3">
-            <div className="mb-6 flex justify-between items-center">
-              <p className="text-gray-600">
-                Mostrando {displayCategories.length} categorías
-              </p>
-            </div>
-
             {loading ? (
               <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {Array.from({ length: 6 }).map((_, i) => (
@@ -132,34 +109,26 @@ const Catalogo = () => {
                 <p className="text-gray-500 text-lg">No se encontraron categorías</p>
               </div>
             ) : (
-              <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+              <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-6">
                 {displayCategories.map(cat => (
-                  <div key={cat.id} className="bg-white rounded-xl shadow-sm hover:shadow-lg transition overflow-hidden group">
-                    <div className="w-full h-48 overflow-hidden">
+                  <Link
+                    key={cat.id}
+                    to={`/categoria/${cat.id}`}
+                    className="bg-white rounded-xl shadow-sm hover:shadow-lg transition overflow-hidden group block"
+                  >
+                    <div className="w-full h-32 sm:h-48 overflow-hidden">
                       <img
                         src={cat.imagen || noImage}
                         alt={cat.departamento}
-                        className="w-full h-48 object-cover group-hover:scale-105 transition duration-300"
+                        className="w-full h-full object-cover group-hover:scale-105 transition duration-300"
                         onError={e => { e.target.src = noImage; }}
                       />
                     </div>
-                    <div className="p-5">
-                      <h3 className="font-bold text-lg text-gray-900">{cat.departamento}</h3>
-                      <div className="flex items-center gap-2 mt-2">
-                        <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold bg-blue-100 text-blue-700">
-                          {cat.total?.toLocaleString()} productos
-                        </span>
-                      </div>
-                      <div className="mt-4">
-                        <Link
-                          to={`/categoria/${cat.id}`}
-                          className="block w-full text-center bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 transition text-sm font-semibold"
-                        >
-                          Ver productos →
-                        </Link>
-                      </div>
+                    <div className="p-3 sm:p-5">
+                      <h3 className="font-bold text-sm sm:text-lg text-gray-900 line-clamp-2">{cat.departamento}</h3>
+                      <p className="text-xs text-gray-500 mt-1">{cat.total?.toLocaleString()} productos</p>
                     </div>
-                  </div>
+                  </Link>
                 ))}
               </div>
             )}

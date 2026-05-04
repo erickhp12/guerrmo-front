@@ -3,6 +3,7 @@ import { Link, useParams } from 'react-router-dom';
 import logo from '../../assets/img/miniLogo.png';
 const noImage = 'https://guerrmo-store.s3.us-east-1.amazonaws.com/general/no-image.svg';
 import config from '../../config.js';
+import { getProfile, apiFetch } from '../../utils.js';
 import Navbar from '../../components/Navbar';
 
 const ProductoDetalle = () => {
@@ -25,15 +26,29 @@ const ProductoDetalle = () => {
       });
   }, [id]);
 
-  const addToCart = () => {
-    const cart = JSON.parse(localStorage.getItem('guerrmo_cart') || '[]');
-    const existing = cart.find(item => item.clave === product.clave);
-    if (existing) {
-      localStorage.setItem('guerrmo_cart', JSON.stringify(
-        cart.map(item => item.clave === product.clave ? { ...item, quantity: item.quantity + quantity } : item)
-      ));
-    } else {
-      localStorage.setItem('guerrmo_cart', JSON.stringify([...cart, { ...product, quantity }]));
+  const addToCart = async () => {
+    const profile = getProfile();
+    if (!profile || profile.client_id === 0) return;
+    try {
+      const res = await apiFetch(`${config.API_URL}/articles/add-article/`, {
+        method: 'POST',
+        body: JSON.stringify({
+          article: product.clave,
+          client: profile.client_id,
+          price: product.precio,
+          description: product.descripcion,
+          features: product.caracteristicas || '',
+          qty: quantity,
+        }),
+      });
+      const data = await res.json();
+      if (data.error) {
+        console.error('Error al agregar al carrito:', data.message);
+        return;
+      }
+    } catch (err) {
+      console.error('Error al agregar al carrito:', err);
+      return;
     }
     setAdded(true);
     setTimeout(() => setAdded(false), 2000);

@@ -14,16 +14,18 @@ const useDebounce = (value, delay = 300) => {
   return debounced;
 };
 
-const SkeletonRow = () => (
-  <tr className="animate-pulse">
-    <td className="px-4 py-3"><div className="h-4 bg-gray-200 rounded w-24" /></td>
-    <td className="px-4 py-3"><div className="h-4 bg-gray-200 rounded w-48" /></td>
-    <td className="px-4 py-3 hidden md:table-cell"><div className="h-4 bg-gray-200 rounded w-28" /></td>
-    <td className="px-4 py-3 hidden lg:table-cell"><div className="h-4 bg-gray-200 rounded w-32" /></td>
-    <td className="px-4 py-3"><div className="h-4 bg-gray-200 rounded w-16 ml-auto" /></td>
-    <td className="px-4 py-3 hidden sm:table-cell"><div className="h-6 bg-gray-200 rounded-full w-20 ml-auto" /></td>
-    <td className="px-4 py-3"><div className="h-7 bg-gray-200 rounded-lg w-20 mx-auto" /></td>
-  </tr>
+const SkeletonCard = () => (
+  <div className="bg-white rounded-xl border border-gray-100 p-3 animate-pulse flex flex-col gap-2">
+    <div className="h-3 bg-gray-200 rounded w-1/2" />
+    <div className="h-4 bg-gray-200 rounded w-full" />
+    <div className="h-4 bg-gray-200 rounded w-3/4" />
+    <div className="h-5 bg-gray-200 rounded-full w-1/3 mt-1" />
+    <div className="flex justify-between items-center mt-2">
+      <div className="h-6 bg-gray-200 rounded w-1/3" />
+      <div className="h-5 bg-gray-200 rounded-full w-1/4" />
+    </div>
+    <div className="h-9 bg-gray-200 rounded-lg w-full mt-1" />
+  </div>
 );
 
 const useQueryParams = () => {
@@ -387,107 +389,83 @@ const CategoriaProductos = () => {
                 </div>
               )}
 
-              {/* Table */}
-              <div className="overflow-x-auto rounded-xl border border-gray-100">
-                <table className="w-full text-sm">
-                  <thead className="bg-gray-50 text-gray-500 uppercase text-xs">
-                    <tr>
-                      <th className="px-3 sm:px-4 py-3 text-left">Clave</th>
-                      <th className="px-3 sm:px-4 py-3 text-left">Descripción</th>
-                      <th className="px-3 sm:px-4 py-3 text-left hidden md:table-cell">Categoría</th>
-                      <th className="px-3 sm:px-4 py-3 text-left hidden lg:table-cell">Características</th>
-                      <th className="px-3 sm:px-4 py-3 text-right">Precio</th>
-                      <th className="px-3 sm:px-4 py-3 text-right hidden sm:table-cell">Existencia</th>
-                      <th className="px-3 sm:px-4 py-3"></th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-gray-100">
-                    {loading ? (
-                      Array.from({ length: 10 }).map((_, i) => <SkeletonRow key={i} />)
-                    ) : sorted.length === 0 ? (
-                      <tr>
-                        <td colSpan="7" className="px-4 py-12 text-center">
-                          <p className="text-gray-400 text-base">No se encontraron productos</p>
-                          {(search || activeFiltersCount > 0) && (
-                            <button onClick={clearAllFilters} className="mt-2 text-blue-600 text-sm hover:underline">
-                              Limpiar filtros
-                            </button>
-                          )}
-                        </td>
-                      </tr>
-                    ) : (
-                      sorted.map((product, index) => {
-                        const enStock = Number(product.existencia) > 0;
-                        const catSelected = selectedCategorias.includes(product.categoria);
-                        return (
-                          <tr
-                            key={product.clave + index}
-                            className={`hover:bg-blue-50 transition ${!enStock ? 'opacity-60' : ''}`}
+              {/* Product cards — optimized for mobile */}
+              {loading ? (
+                <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 sm:gap-3">
+                  {Array.from({ length: 12 }).map((_, i) => <SkeletonCard key={i} />)}
+                </div>
+              ) : sorted.length === 0 ? (
+                <div className="py-16 text-center">
+                  <p className="text-gray-400 text-base">No se encontraron productos</p>
+                  {(search || activeFiltersCount > 0) && (
+                    <button onClick={clearAllFilters} className="mt-3 text-blue-600 text-sm hover:underline">
+                      Limpiar filtros
+                    </button>
+                  )}
+                </div>
+              ) : (
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-3">
+                  {sorted.map((product, index) => {
+                    const enStock = Number(product.existencia) > 0;
+                    const catSelected = selectedCategorias.includes(product.categoria);
+                    return (
+                      <div
+                        key={product.clave + index}
+                        className={`bg-white rounded-xl border border-gray-100 shadow-sm flex flex-col p-3 transition hover:shadow-md ${!enStock ? 'opacity-60' : ''}`}
+                      >
+                        {/* Clave */}
+                        <span className="font-mono text-gray-400 text-[10px] leading-tight truncate">
+                          {product.clave}
+                          {product.claveAlterna && product.claveAlterna !== product.clave && ` / ${product.claveAlterna}`}
+                        </span>
+
+                        {/* Descripción */}
+                        <p className="text-gray-900 font-semibold text-xs sm:text-sm leading-snug line-clamp-2 min-h-[2.5rem] mt-1">
+                          {product.descripcion}
+                        </p>
+
+                        {/* Categoría badge */}
+                        {product.categoria && (
+                          <button
+                            onClick={() => toggleCategoria(product.categoria)}
+                            className={`self-start mt-1.5 px-2 py-0.5 rounded-full text-[14px] font-medium transition ${
+                              catSelected
+                                ? 'bg-blue-600 text-white'
+                                : 'bg-gray-100 text-gray-500 hover:bg-blue-100 hover:text-blue-700'
+                            }`}
                           >
-                            <td className="px-3 sm:px-4 py-3 whitespace-nowrap">
-                              <span className="font-mono text-gray-700 text-xs">{product.clave}</span>
-                              {product.claveAlterna && product.claveAlterna !== product.clave && (
-                                <p className="font-mono text-gray-400 text-xs mt-0.5">{product.claveAlterna}</p>
-                              )}
-                            </td>
-                            <td className="px-3 sm:px-4 py-3 text-gray-900 font-medium">
-                              <span className="line-clamp-2 sm:line-clamp-none">{product.descripcion}</span>
-                              {/* Show category inline on mobile (hidden md) */}
-                              {product.categoria && (
-                                <button
-                                  onClick={() => toggleCategoria(product.categoria)}
-                                  className={`md:hidden mt-1 px-2 py-0.5 rounded-full text-xs font-medium transition ${
-                                    catSelected
-                                      ? 'bg-blue-600 text-white'
-                                      : 'bg-gray-100 text-gray-500 hover:bg-blue-100 hover:text-blue-700'
-                                  }`}
-                                >
-                                  {product.categoria}
-                                </button>
-                              )}
-                            </td>
-                            <td className="px-3 sm:px-4 py-3 hidden md:table-cell whitespace-nowrap text-xs">
-                              <button
-                                onClick={() => toggleCategoria(product.categoria)}
-                                className={`px-2 py-0.5 rounded-full text-xs font-medium transition ${
-                                  catSelected
-                                    ? 'bg-blue-600 text-white'
-                                    : 'bg-gray-100 text-gray-500 hover:bg-blue-100 hover:text-blue-700'
-                                }`}
-                              >
-                                {product.categoria}
-                              </button>
-                            </td>
-                            <td className="px-3 sm:px-4 py-3 text-gray-500 text-xs hidden lg:table-cell max-w-xs">{product.caracteristicas}</td>
-                            <td className="px-3 sm:px-4 py-3 text-right font-bold text-blue-600 whitespace-nowrap text-xs sm:text-sm">
-                              ${Number(product.precio).toLocaleString('es-MX', { minimumFractionDigits: 2 })}
-                            </td>
-                            <td className="px-3 sm:px-4 py-3 text-right hidden sm:table-cell">
-                              {enStock ? (
-                                <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold bg-green-100 text-green-700 whitespace-nowrap">
-                                  {Number(product.existencia).toLocaleString()} pzas
-                                </span>
-                              ) : (
-                                <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold bg-red-100 text-red-600 whitespace-nowrap">
-                                  Sin stock
-                                </span>
-                              )}
-                            </td>
-                            <td className="px-3 sm:px-4 py-3 text-center">
-                              <Link
-                                to={`/producto/${product.clave}`}
-                                className="bg-gray-700 text-white px-3 py-2.5 rounded-lg hover:bg-gray-900 transition text-xs font-semibold whitespace-nowrap min-h-[44px] flex items-center"
-                              >
-                                Ver →
-                              </Link>
-                            </td>
-                          </tr>
-                        );
-                      })
-                    )}
-                  </tbody>
-                </table>
-              </div>
+                            {product.categoria}
+                          </button>
+                        )}
+
+                        {/* Price + stock — spacer pushes this to bottom */}
+                        <div className="mt-auto pt-2 flex items-end justify-between gap-1">
+                          <span className="font-bold text-blue-600 text-sm sm:text-lg leading-none">
+                            ${Number(product.precio).toLocaleString('es-MX', { minimumFractionDigits: 0 })}
+                          </span>
+                          {enStock ? (
+                            <span className="text-[14px] font-semibold text-green-700 bg-green-50 px-1.5 py-0.5 rounded-full whitespace-nowrap">
+                              {Number(product.existencia).toLocaleString()} piezas
+                            </span>
+                          ) : (
+                            <span className="text-[14px] font-semibold text-red-600 bg-red-50 px-1.5 py-0.5 rounded-full whitespace-nowrap">
+                              Sin stock
+                            </span>
+                          )}
+                        </div>
+
+                        {/* CTA */}
+                        <Link
+                          to={`/producto/${product.clave}`}
+                          className="mt-2 block w-full text-center bg-gray-800 text-white py-2 rounded-lg hover:bg-gray-900 transition text-xs font-semibold min-h-[36px] flex items-center justify-center"
+                        >
+                          Ver detalle →
+                        </Link>
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
             </div>
           </div>
         </div>

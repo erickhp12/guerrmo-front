@@ -8,6 +8,7 @@ import Sidebar from 'components/Sidebar';
 import React, { useState } from 'react';
 import { Redirect, Route, Switch } from 'react-router-dom';
 import routes from 'routes.js';
+import { getProfile } from 'utils';
 import '@fontsource/roboto/400.css';
 import '@fontsource/roboto/500.css';
 import '@fontsource/roboto/700.css';
@@ -68,6 +69,8 @@ export default function Dashboard(props) {
 		return activeNavbar;
 	};
 	const getRoutes = (routes) => {
+		const profile = getProfile();
+		const isAdmin = profile.is_admin === true;
 		return routes.map((prop, key) => {
 			if (prop.collapse) {
 				return getRoutes(prop.views);
@@ -76,7 +79,23 @@ export default function Dashboard(props) {
 				return getRoutes(prop.views);
 			}
 			if (prop.layout === '/admin') {
-				return <Route path={prop.layout + prop.path} component={prop.component} key={key} />;
+				if (prop.isSuperAdmin && !isAdmin) {
+					return (
+						<Route
+							path={prop.layout + prop.path}
+							component={() => <Redirect to='/auth/signin' />}
+							key={key}
+						/>
+					);
+				} else {
+					return (
+						<Route
+							path={prop.layout + prop.path}
+							component={prop.component}
+							key={key}
+						/>
+					);
+				}
 			} else {
 				return null;
 			}

@@ -22,7 +22,9 @@ const SidebarContent = ({ logoText, routes }) => {
 
   // to check for active links and opened collapses
   let location = useLocation();
-  let client_id = utils.getProfile().client_id;
+  const profile = utils.getProfile();
+  let client_id = profile.client_id;
+  const isAdmin = profile.is_admin === true;
   
   // this is for the rest of the collapses
   const [state, setState] = React.useState({});
@@ -75,7 +77,7 @@ const SidebarContent = ({ logoText, routes }) => {
               boxSize="initial"
               justifyContent="flex-start"
               alignItems="center"
-              hidden={client_id == 0 && prop.requireLogin || client_id !== 0 && prop.isLogin}
+              hidden={(prop.isSuperAdmin && !isAdmin) || (client_id == 0 && prop.requireLogin) || (client_id !== 0 && prop.isLogin)}
               bg={activeBg}
               mb={{
                 xl: "12px",
@@ -127,7 +129,7 @@ const SidebarContent = ({ logoText, routes }) => {
               justifyContent="flex-start"
               alignItems="center"
               bg="transparent"
-              hidden={(prop.isSuperAdmin && client_id !== 355) || (client_id === 0 && prop.requireLogin) || client_id !== 0 && prop.isLogin}
+              hidden={(prop.isSuperAdmin && !isAdmin) || (client_id === 0 && prop.requireLogin) || (client_id !== 0 && prop.isLogin)}
               mb={{
                 xl: "12px",
               }}

@@ -9,6 +9,7 @@ import {
   Td,
   useColorModeValue,
 } from "@chakra-ui/react";
+// Note: Th imported for header row
 // Custom components
 import Card from "components/Card/Card.js";
 import CardBody from "components/Card/CardBody.js";
@@ -21,6 +22,15 @@ const OrdersClients = ({ data }) => {
     <Card overflowX={{ sm: "scroll", xl: "hidden" }}>
       <CardBody>
         <Table variant='simple' color={textColor}>
+          <Thead>
+            <Tr>
+              <Th>Fecha</Th>
+              <Th>Cliente</Th>
+              <Th>Estado</Th>
+              <Th isNumeric>Total</Th>
+              <Th></Th>
+            </Tr>
+          </Thead>
           { data.data && data.data.length > 0 ? (
             <Tbody>
               {data.data.map((row, index) => {

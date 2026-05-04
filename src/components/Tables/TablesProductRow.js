@@ -28,6 +28,10 @@ function TablesProductRow(props) {
     try {
       console.log('entrando a addCart', new Date());
       const profile = utils.getProfile();
+      if (!utils.isSessionValid(profile)) {
+        console.warn('No valid session — cannot add to cart');
+        return;
+      }
       const dataToSend = {
         client: profile.client_id,
         article: data.clave,
@@ -35,12 +39,8 @@ function TablesProductRow(props) {
         description: data.descripcion,
         features: data.caracteristicas
       }
-      await fetch(`${config.API_URL}/articles/add-article/`,
-      {
+      await utils.apiFetch(`${config.API_URL}/articles/add-article/`, {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
         body: JSON.stringify(dataToSend),
       }).then((response) => response.json());
       setExistence(existence-1);
@@ -51,14 +51,9 @@ function TablesProductRow(props) {
     }
   }
 
-  // useEffect(() => {
-  //     console.log('entrando', count)
-      // setExistence(existenciaHenequen);
-  //     // addCart();
-  //     getProfile();
-  //     setLoading(false);
-  //     setCount(1);
-  // }, []);
+  useEffect(() => {
+    setClient(utils.getProfile());
+  }, []);
 
   const { item, clave, claveAlterna, precio, existenciaHenequen, existenciaMezquital, existenciaCarlosAmaya,  descripcion, caracteristicas } = props;
   const textColor = useColorModeValue("gray.700", "white");

@@ -7,7 +7,9 @@ import Pedido from './views/Mockup/Pedido';
 import AdminPanel from './views/Mockup/AdminPanel';
 import CategoriaProductos from './views/Mockup/CategoriaProductos';
 import BuscarResultados from './views/Mockup/BuscarResultados';
+import Login from './views/Mockup/Login';
 import NotFound from './views/Mockup/NotFound';
+import Sucursales from './views/Mockup/Sucursales';
 
 const MockupRoutes = () => {
   return (
@@ -15,9 +17,11 @@ const MockupRoutes = () => {
       <Route exact path="/" component={Home} />
       <Route exact path="/catalogo" component={Catalogo} />
       <Route exact path="/buscar" component={BuscarResultados} />
+      <Route exact path="/sucursales" component={Sucursales} />
       <Route exact path="/categoria/:dep_id" component={CategoriaProductos} />
       <Route exact path="/producto/:id" component={ProductoDetalle} />
       <Route exact path="/pedido" component={Pedido} />
+      <Route exact path="/login" component={Login} />
       <Route exact path="/admin" component={AdminPanel} />
       <Route component={NotFound} />
     </Switch>

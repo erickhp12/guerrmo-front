@@ -19,7 +19,7 @@ import {
 import signInImage from "assets/img/signInImage.png";
 
 function SignIn() {
-  const [client, setClient] = useState(0);
+  const [telefono, setTelefono] = useState('');
   const [password, setPassword] = useState('');
 
   const login = async () => {
@@ -30,7 +30,7 @@ function SignIn() {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({client_id:client, password:password}),
+        body: JSON.stringify({telefono:telefono, password:password}),
       }).then((response) => response.json());
       const error = response.error
       if (!error) {
@@ -38,8 +38,8 @@ function SignIn() {
         window.location.replace('/#/admin/profile')
         localStorage.setItem('profile', profile)
       } else {
-        alert('Usuario o contrasena incorrecto')
-        setClient(0)
+        alert('Teléfono o contraseña incorrectos')
+        setTelefono('')
         setPassword('')
       }
     } catch (error) {
@@ -88,17 +88,17 @@ function SignIn() {
             </Text>
             <FormControl>
               <FormLabel ms='4px' fontSize='sm' fontWeight='normal'>
-                ID Cliente
+                Teléfono
               </FormLabel>
               <Input
                 borderRadius='15px'
                 mb='24px'
-                maxLength={3}
                 fontSize='sm'
-                type='number'
-                placeholder='ID Cliente'
+                type='tel'
+                value={telefono}
+                placeholder='Número de teléfono'
                 size='lg'
-                onChange={e => setClient(e.target.value)}
+                onChange={e => setTelefono(e.target.value)}
               />
               <FormLabel ms='4px' fontSize='sm' fontWeight='normal'>
                 Contraseña

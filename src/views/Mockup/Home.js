@@ -97,7 +97,7 @@ const Home = () => {
                       onError={e => { e.target.src = noImage; }}
                     />
                   </div>
-                  <h3 className="font-semibold text-gray-900 group-hover:text-blue-600">{cat.name}</h3>
+                  <h3 className="font-semild text-gray-900 group-hover:text-blue-600">{cat.name}</h3>
                   <p className="text-sm text-gray-500 mt-1">{cat.count} productos</p>
                 </Link>
               ))}
@@ -156,8 +156,12 @@ const Home = () => {
                 tel2: '(656) 345-59-97',
                 email: 'sanlorenzo@guerrmo.com',
               },
-            ].map(s => (
-              <div key={s.name} className="bg-white rounded-xl shadow-sm overflow-hidden card-hover flex flex-col">
+            ].map((s, i) => (
+              <Link
+                key={s.name}
+                to={`/sucursales?s=${i}`}
+                className="bg-white rounded-xl shadow-sm overflow-hidden card-hover flex flex-col group"
+              >
                 <img
                   src={s.img || noImage}
                   alt={`Sucursal ${s.name}`}
@@ -165,7 +169,7 @@ const Home = () => {
                   onError={e => { e.target.src = noImage; }}
                 />
                 <div className="p-5 flex flex-col gap-3 flex-1">
-                  <h3 className="font-bold text-lg text-gray-900">{s.name}</h3>
+                  <h3 className="font-bold text-lg text-gray-900 group-hover:text-blue-600 transition-colors">{s.name}</h3>
                   <ul className="space-y-2 text-sm text-gray-600">
                     <li className="flex items-start gap-2">
                       <FiMapPin className="mt-0.5 shrink-0 text-gray-400" size={14} />
@@ -173,21 +177,24 @@ const Home = () => {
                     </li>
                     <li className="flex items-center gap-2">
                       <FiPhone className="shrink-0 text-gray-400" size={14} />
-                      <a href={`tel:${s.tel1.replace(/\D/g,'')}`} className="hover:text-blue-600 transition-colors">{s.tel1}</a>
+                      <span>{s.tel1}</span>
                       <span className="text-gray-300">·</span>
-                      <a href={`tel:${s.tel2.replace(/\D/g,'')}`} className="hover:text-blue-600 transition-colors">{s.tel2}</a>
+                      <span>{s.tel2}</span>
                     </li>
                     <li className="flex items-center gap-2">
                       <FiMail className="shrink-0 text-gray-400" size={14} />
-                      <a href={`mailto:${s.email}`} className="hover:text-blue-600 transition-colors truncate">{s.email}</a>
+                      <span className="truncate">{s.email}</span>
                     </li>
                     <li className="flex items-start gap-2">
                       <FiClock className="shrink-0 text-gray-400" size={14} />
                       <span>Lun–Vie 9am–6pm · Sáb 9am–4pm</span>
                     </li>
                   </ul>
+                  <span className="text-blue-600 text-sm font-medium mt-auto pt-2 group-hover:underline">
+                    Ver en mapa →
+                  </span>
                 </div>
-              </div>
+              </Link>
             ))}
           </div>
         </div>

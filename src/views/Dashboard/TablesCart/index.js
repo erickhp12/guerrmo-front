@@ -17,18 +17,18 @@ function TablesCart() {
 
   const getCart = async () => {
     try {
-      let client_id = 1
-      const ls_profile = JSON.parse(localStorage.getItem('profile'))
-      if (ls_profile) {
-        client_id = ls_profile.client_id
-        setProfile(profile)
+      const ls_profile = JSON.parse(localStorage.getItem('profile'));
+      if (!ls_profile || !ls_profile.client_id || ls_profile.client_id === 0) {
+        setArticles([]);
+        return;
       }
-      const response = await fetch(`${config.API_URL}/articles/cart/${client_id}`).then((response) => response.json());
-      setArticles(response.data)
+      setProfile(ls_profile);
+      const response = await fetch(`${config.API_URL}/articles/cart/${ls_profile.client_id}`).then((response) => response.json());
+      setArticles(response.data);
     } catch (error) {
       setArticles([]);
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
   }
 
