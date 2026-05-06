@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-const noImage = 'https://guerrmo-store.s3.us-east-1.amazonaws.com/general/no-image.svg';
+const noImage = 'https://guerrmo-store.s3.us-east-1.amazonaws.com/general/default-image.png';
 import Navbar from '../../components/Navbar';
+import SEO from '../../components/SEO';
 import config from '../../config.js';
 import { getProfile, apiFetch } from '../../utils.js';
+import { trackPurchase } from '../../analytics';
 
 const emptyForm = {
   nombre: '',
@@ -125,6 +127,7 @@ const Pedido = () => {
       setSubmitting(false);
       return;
     }
+    trackPurchase({ cart, total, getItemKey, getItemName, getItemPrice, getItemQty });
     setSubmitted(true);
     setCart([]);
     setSubmitting(false);
@@ -177,6 +180,11 @@ const Pedido = () => {
 
   return (
     <div className="min-h-screen bg-gray-50">
+      <SEO
+        title="Mi Pedido"
+        description="Revisa los productos en tu pedido de refacciones Guerrmo y completa tus datos de contacto para coordinar la entrega."
+        noIndex={true}
+      />
       <Navbar />
 
       <div className="bg-gradient-to-r from-slate-900 to-slate-400 text-white py-12">
@@ -209,6 +217,7 @@ const Pedido = () => {
                         src={item.image || noImage}
                         alt={getItemName(item)}
                         className="w-20 h-20 sm:w-24 sm:h-24 object-cover rounded-lg shrink-0"
+                        loading="lazy"
                         onError={e => { e.target.src = noImage; }}
                       />
                       <div className="flex-1 min-w-0">

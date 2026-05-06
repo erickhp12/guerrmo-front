@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import ReactDOM from "react-dom";
 import { HashRouter } from "react-router-dom";
+import { HelmetProvider } from "react-helmet-async";
 import MockupRoutes from "./mockupRoutes";
 import config from "./config.js";
 import { initSession } from "./utils.js";
@@ -28,4 +29,9 @@ const App = () => {
   );
 };
 
-ReactDOM.render(<App />, document.getElementById("root"));
+ReactDOM.render(
+  <HelmetProvider>
+    <App />
+  </HelmetProvider>,
+  document.getElementById("root")
+);
