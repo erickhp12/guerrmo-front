@@ -3,7 +3,7 @@ import { useLocation } from 'react-router-dom';
 import { FiMapPin, FiPhone, FiMail, FiClock, FiExternalLink } from 'react-icons/fi';
 import Navbar from '../../components/Navbar';
 
-const noImage = 'https://guerrmo-store.s3.us-east-1.amazonaws.com/general/no-image.svg';
+const noImage = 'https://guerrmo-store.s3.us-east-1.amazonaws.com/general/default-image.png';
 
 const SUCURSALES = [
   {
