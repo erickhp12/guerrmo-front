@@ -4,6 +4,7 @@ import logo from '../../assets/img/miniLogo.png';
 import config from '../../config.js';
 import SearchBar from '../../components/SearchBar';
 import Navbar from '../../components/Navbar';
+import { trackSearch } from '../../analytics';
 
 const SkeletonRow = () => (
   <tr className="animate-pulse">
@@ -40,6 +41,7 @@ const BuscarResultados = () => {
         setResults(Array.isArray(data) ? data : []);
         setLoading(false);
         setSearched(true);
+        trackSearch(query.trim());
       })
       .catch(() => {
         setResults([]);

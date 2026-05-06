@@ -1,9 +1,10 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { Link, useParams, useLocation, useHistory } from 'react-router-dom';
 import logo from '../../assets/img/miniLogo.png';
-const noImage = 'https://guerrmo-store.s3.us-east-1.amazonaws.com/general/no-image.svg';
+const noImage = 'https://guerrmo-store.s3.us-east-1.amazonaws.com/general/default-image.png';
 import config from '../../config.js';
 import Navbar from '../../components/Navbar';
+import SEO from '../../components/SEO';
 
 const useDebounce = (value, delay = 300) => {
   const [debounced, setDebounced] = useState(value);
@@ -254,6 +255,11 @@ const CategoriaProductos = () => {
 
   return (
     <div className="min-h-screen bg-gray-50">
+      <SEO
+        pageTitle={categoryName ? `${categoryName} en Ciudad Juárez — Guerrmo` : 'Refacciones en Ciudad Juárez — Guerrmo'}
+        description={`${categoryName ? `Compra ${categoryName} en Guerrmo,` : 'Refacciones automotrices en Guerrmo,'} distribuidora en Ciudad Juárez, Chihuahua. ${products.length > 0 ? `${products.length} productos disponibles.` : 'Amplio catálogo.'} Encuentra la refacción que necesitas.`}
+        ogImage={categoryImage || undefined}
+      />
       <Navbar />
 
       {/* Breadcrumb */}

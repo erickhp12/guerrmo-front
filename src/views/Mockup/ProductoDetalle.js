@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import logo from '../../assets/img/miniLogo.png';
-const noImage = 'https://guerrmo-store.s3.us-east-1.amazonaws.com/general/no-image.svg';
+const noImage = 'https://guerrmo-store.s3.us-east-1.amazonaws.com/general/default-image.png';
 import config from '../../config.js';
 import { getProfile, apiFetch } from '../../utils.js';
 import Navbar from '../../components/Navbar';
+import SEO from '../../components/SEO';
+import { trackAddToCart } from '../../analytics';
 
 const ProductoDetalle = () => {
   const { id } = useParams();
@@ -50,6 +52,7 @@ const ProductoDetalle = () => {
       console.error('Error al agregar al carrito:', err);
       return;
     }
+    trackAddToCart({ clave: product.clave, descripcion: product.descripcion, precio: product.precio, quantity });
     setAdded(true);
     setTimeout(() => setAdded(false), 2000);
   };
@@ -71,8 +74,37 @@ const ProductoDetalle = () => {
     );
   }
 
+  const productStructuredData = {
+    "@context": "https://schema.org",
+    "@type": "Product",
+    "name": product.descripcion,
+    "description": product.caracteristicas || product.descripcion,
+    "sku": product.clave,
+    "brand": {
+      "@type": "Brand",
+      "name": "Guerrmo"
+    },
+    "offers": {
+      "@type": "Offer",
+      "priceCurrency": "MXN",
+      "price": Number(product.precio),
+      "availability": product.existencia > 0
+        ? "https://schema.org/InStock"
+        : "https://schema.org/OutOfStock",
+      "seller": {
+        "@type": "Organization",
+        "name": "Guerrmo"
+      }
+    }
+  };
+
   return (
     <div className="min-h-screen bg-gray-50">
+      <SEO
+        pageTitle={`${product.descripcion} — Guerrmo Refacciones Ciudad Juárez`}
+        description={`Compra ${product.descripcion} en Guerrmo, refacciones automotrices en Ciudad Juárez. Clave: ${product.clave}${product.caracteristicas ? `. ${product.caracteristicas}` : ''}. ${product.existencia > 0 ? 'En existencia' : 'Consultar disponibilidad'}.`}
+        structuredData={productStructuredData}
+      />
       <Navbar />
 
       {/* Breadcrumb */}

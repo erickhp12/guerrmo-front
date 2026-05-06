@@ -2,10 +2,11 @@ import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { FiMapPin, FiPhone, FiMail, FiClock, FiTruck, FiPackage, FiZap, FiArrowLeft, FiArrowRight } from 'react-icons/fi';
 import logo from '../../assets/img/miniLogo.png';
-const noImage = 'https://guerrmo-store.s3.us-east-1.amazonaws.com/general/no-image.svg';
+const noImage = 'https://guerrmo-store.s3.us-east-1.amazonaws.com/general/default-image.png';
 import config from '../../config.js';
 import SearchBar from '../../components/SearchBar';
 import Navbar from '../../components/Navbar';
+import SEO from '../../components/SEO';
 
 const Home = () => {
   const [categories, setCategories] = useState([]);
@@ -39,6 +40,10 @@ const Home = () => {
 
   return (
     <div className="min-h-screen bg-gray-50">
+      <SEO
+        title="Refacciones Automotrices en Ciudad Juárez"
+        description="Guerrmo — Distribuidor de refacciones automotrices en Ciudad Juárez, Chihuahua. Más de 10,000 productos en stock con entrega a domicilio y asesoría personalizada."
+      />
       <Navbar />
 
       {/* Hero Section */}
@@ -94,6 +99,7 @@ const Home = () => {
                       className="max-h-16 max-w-[5rem] object-contain"
                       src={cat.icon || noImage}
                       alt={cat.name}
+                      loading="lazy"
                       onError={e => { e.target.src = noImage; }}
                     />
                   </div>
@@ -166,6 +172,7 @@ const Home = () => {
                   src={s.img || noImage}
                   alt={`Sucursal ${s.name}`}
                   className="w-full h-44 object-cover"
+                  loading="lazy"
                   onError={e => { e.target.src = noImage; }}
                 />
                 <div className="p-5 flex flex-col gap-3 flex-1">
