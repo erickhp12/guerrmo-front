@@ -55,7 +55,7 @@ function TablesProductRow(props) {
     setClient(utils.getProfile());
   }, []);
 
-  const { item, clave, claveAlterna, precio, existenciaHenequen, existenciaMezquital, existenciaCarlosAmaya,  descripcion, caracteristicas } = props;
+  const { item, clave, claveAlterna, precio, stock, descripcion, caracteristicas } = props;
   const textColor = useColorModeValue("gray.700", "white");
 
   return (
@@ -94,27 +94,19 @@ function TablesProductRow(props) {
           </Text>
         </Flex>
       </Td>
-      <Td>
-        <Flex direction="column">
-          <Text fontSize="md" color={textColor} fontWeight="semi-bold">
-            {existenciaHenequen}
-          </Text>
-        </Flex>
-      </Td>
-      <Td>
-        <Flex direction="column">
-          <Text fontSize="md" color={textColor} fontWeight="semi-bold">
-            {existenciaMezquital}
-          </Text>
-        </Flex>
-      </Td>
-      <Td minWidth={{ sm: "200px" }}>
-        <Flex direction="column">
-          <Text fontSize="md" color={textColor} fontWeight="semi-bold">
-            {existenciaCarlosAmaya}
-          </Text>
-        </Flex>
-      </Td>
+      {Array.isArray(stock) && stock.map(s => (
+        <Td key={s.sucursal}>
+          <Flex direction="column">
+            <Text
+              fontSize="md"
+              color={s.existencia > 0 ? 'green.500' : 'red.400'}
+              fontWeight="semi-bold"
+            >
+              {Number(s.existencia).toLocaleString()}
+            </Text>
+          </Flex>
+        </Td>
+      ))}
       <Td hidden = { client.client_id === 0}>
         <Button
           disabled={addedToCart }

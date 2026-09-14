@@ -1,6 +1,7 @@
 import React, { lazy, Suspense, useEffect } from 'react';
 import { Route, Switch, useLocation } from 'react-router-dom';
 import { trackPageView } from './analytics';
+import WhatsAppButton from './components/WhatsAppButton';
 
 const Home = lazy(() => import('./views/Mockup/Home'));
 const Catalogo = lazy(() => import('./views/Mockup/Catalogo'));
@@ -31,6 +32,7 @@ const MockupRoutes = () => {
   return (
     <Suspense fallback={<PageLoader />}>
       <RouteTracker />
+      <WhatsAppButton />
       <Switch>
         <Route exact path="/" component={Home} />
         <Route exact path="/catalogo" component={Catalogo} />

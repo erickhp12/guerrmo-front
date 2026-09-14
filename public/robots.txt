@@ -1,10 +1,8 @@
 User-agent: *
 Allow: /
 
-# TODO(human): agrega aquí las rutas que NO quieres que Google indexe
-# Ejemplos ya sugeridos — descomenta o modifica según el negocio:
-Disallow: /#/admin
-Disallow: /#/pedido
-Disallow: /#/login
+Disallow: /admin
+Disallow: /pedido
+Disallow: /login
 
 Sitemap: https://guerrmo.com/sitemap.xml
