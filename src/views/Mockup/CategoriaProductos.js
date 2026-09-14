@@ -3,6 +3,7 @@ import { Link, useParams, useLocation, useHistory } from 'react-router-dom';
 import logo from '../../assets/img/miniLogo.png';
 const noImage = 'https://guerrmo-store.s3.us-east-1.amazonaws.com/general/default-image.png';
 import config from '../../config.js';
+import { getProfile } from '../../utils.js';
 import Navbar from '../../components/Navbar';
 import SEO from '../../components/SEO';
 
@@ -76,8 +77,9 @@ const CategoriaProductos = () => {
   const maxPrecio = getParam('maxPrecio', '');
 
   useEffect(() => {
+    const priceTier = getProfile()?.price ?? 1;
     Promise.all([
-      fetch(`${config.API_URL}/articles/articles-by-category/0/${dep_id}`).then(r => r.json()),
+      fetch(`${config.API_URL}/articles/articles-by-category/${priceTier}/${dep_id}`).then(r => r.json()),
       fetch(`${config.API_URL}/articles/categories/`).then(r => r.json()),
     ]).then(([articlesData, categoriesData]) => {
       if (!articlesData.error) {
@@ -132,16 +134,22 @@ const CategoriaProductos = () => {
     });
   }, [products, debouncedSearch, selectedCategorias, minPrecio, maxPrecio]);
 
+  const totalStock = (p) => Array.isArray(p.stock)
+    ? p.stock.reduce((sum, s) => sum + Number(s.existencia), 0)
+    : Number(p.existencia || 0);
+
   const sorted = useMemo(() => {
     return [...filtered].sort((a, b) => {
       if (sortBy === 'precio-asc') return Number(a.precio) - Number(b.precio);
       if (sortBy === 'precio-desc') return Number(b.precio) - Number(a.precio);
-      if (sortBy === 'existencia') return Number(b.existencia) - Number(a.existencia);
+      if (sortBy === 'existencia') return totalStock(b) - totalStock(a);
       return 0;
     });
   }, [filtered, sortBy]);
 
-  const inStock = products.filter(p => Number(p.existencia) > 0).length;
+  const inStock = products.filter(p =>
+    Array.isArray(p.stock) ? p.stock.some(s => s.existencia > 0) : Number(p.existencia) > 0
+  ).length;
 
   const activeFiltersCount = [
     selectedCategorias.length > 0,
@@ -412,7 +420,8 @@ const CategoriaProductos = () => {
               ) : (
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-3">
                   {sorted.map((product, index) => {
-                    const enStock = Number(product.existencia) > 0;
+                    const stock = Array.isArray(product.stock) ? product.stock : [];
+                    const enStock = stock.length > 0 ? stock.some(s => s.existencia > 0) : Number(product.existencia) > 0;
                     const catSelected = selectedCategorias.includes(product.categoria);
                     return (
                       <div
@@ -445,19 +454,13 @@ const CategoriaProductos = () => {
                         )}
 
                         {/* Price + stock — spacer pushes this to bottom */}
-                        <div className="mt-auto pt-2 flex items-end justify-between gap-1">
-                          <span className="font-bold text-blue-600 text-sm sm:text-lg leading-none">
+                        <div className="mt-auto pt-2">
+                          <span className="font-bold text-blue-600 text-sm sm:text-lg leading-none block mb-1.5">
                             ${Number(product.precio).toLocaleString('es-MX', { minimumFractionDigits: 0 })}
                           </span>
-                          {enStock ? (
-                            <span className="text-[14px] font-semibold text-green-700 bg-green-50 px-1.5 py-0.5 rounded-full whitespace-nowrap">
-                              {Number(product.existencia).toLocaleString()} piezas
-                            </span>
-                          ) : (
-                            <span className="text-[14px] font-semibold text-red-600 bg-red-50 px-1.5 py-0.5 rounded-full whitespace-nowrap">
-                              Sin stock
-                            </span>
-                          )}
+                          {/* TODO(human): diseña aquí el indicador visual de stock por sucursal */}
+                          {/* stock es un arreglo: [{sucursal: "Henequen", existencia: 5}, {sucursal: "Mezquital", existencia: 0}] */}
+                          {/* Cada sucursal debe mostrarse — verde con cantidad si existencia > 0, gris si = 0 */}
                         </div>
 
                         {/* CTA */}

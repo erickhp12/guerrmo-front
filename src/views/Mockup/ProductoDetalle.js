@@ -7,6 +7,8 @@ import { getProfile, apiFetch } from '../../utils.js';
 import Navbar from '../../components/Navbar';
 import SEO from '../../components/SEO';
 import { trackAddToCart } from '../../analytics';
+import { FaWhatsapp } from 'react-icons/fa';
+import { SucursalDialog, buildWhatsAppLink } from '../../components/WhatsAppButton';
 
 const ProductoDetalle = () => {
   const { id } = useParams();
@@ -14,9 +16,11 @@ const ProductoDetalle = () => {
   const [loading, setLoading] = useState(true);
   const [quantity, setQuantity] = useState(1);
   const [added, setAdded] = useState(false);
+  const [whatsAppOpen, setWhatsAppOpen] = useState(false);
 
   useEffect(() => {
-    fetch(`${config.API_URL}/articles/product/0/${id}`)
+    const priceTier = getProfile()?.price ?? 1;
+    fetch(`${config.API_URL}/articles/product/${priceTier}/${id}`)
       .then(res => res.json())
       .then(data => {
         if (!data.error) setProduct(data);
@@ -27,6 +31,31 @@ const ProductoDetalle = () => {
         setLoading(false);
       });
   }, [id]);
+
+  const buildWhatsAppMessage = () => {
+    const precio = Number(product.precio).toLocaleString('es-MX', { minimumFractionDigits: 2 });
+    const stockLines = Array.isArray(product.stock) && product.stock.length > 0
+      ? product.stock.map(s => `  • ${s.sucursal}: ${s.existencia > 0 ? `${Number(s.existencia).toLocaleString()} pzas` : 'Sin existencia'}`).join('\n')
+      : '⚠️ Consultar disponibilidad';
+    const extras = product.caracteristicas ? `\n🔧 ${product.caracteristicas}` : '';
+    return (
+      `¡Hola! Me interesa esta pieza:\n\n` +
+      `📦 *${product.descripcion}*\n` +
+      `🔑 Clave: ${product.clave}\n` +
+      `💰 Precio: $${precio} MXN\n` +
+      `📦 Existencia por sucursal:\n${stockLines}${extras}\n\n` +
+      `¿Pueden confirmarme disponibilidad y tiempo de entrega?`
+    );
+  };
+
+  const handleSelectSucursal = (sucursal) => {
+    setWhatsAppOpen(false);
+    window.open(
+      buildWhatsAppLink(sucursal.phone, buildWhatsAppMessage()),
+      '_blank',
+      'noopener,noreferrer',
+    );
+  };
 
   const addToCart = async () => {
     const profile = getProfile();
@@ -74,6 +103,8 @@ const ProductoDetalle = () => {
     );
   }
 
+  const hasStock = Array.isArray(product.stock) && product.stock.some(s => s.existencia > 0);
+
   const productStructuredData = {
     "@context": "https://schema.org",
     "@type": "Product",
@@ -88,7 +119,7 @@ const ProductoDetalle = () => {
       "@type": "Offer",
       "priceCurrency": "MXN",
       "price": Number(product.precio),
-      "availability": product.existencia > 0
+      "availability": hasStock
         ? "https://schema.org/InStock"
         : "https://schema.org/OutOfStock",
       "seller": {
@@ -102,7 +133,7 @@ const ProductoDetalle = () => {
     <div className="min-h-screen bg-gray-50">
       <SEO
         pageTitle={`${product.descripcion} — Guerrmo Refacciones Ciudad Juárez`}
-        description={`Compra ${product.descripcion} en Guerrmo, refacciones automotrices en Ciudad Juárez. Clave: ${product.clave}${product.caracteristicas ? `. ${product.caracteristicas}` : ''}. ${product.existencia > 0 ? 'En existencia' : 'Consultar disponibilidad'}.`}
+        description={`Compra ${product.descripcion} en Guerrmo, refacciones automotrices en Ciudad Juárez. Clave: ${product.clave}${product.caracteristicas ? `. ${product.caracteristicas}` : ''}. ${hasStock ? 'En existencia' : 'Consultar disponibilidad'}.`}
         structuredData={productStructuredData}
       />
       <Navbar />
@@ -160,18 +191,41 @@ const ProductoDetalle = () => {
               )}
 
               <div className="bg-gray-50 rounded-xl p-6">
-                <div className="flex items-baseline gap-3 mb-3">
+                <div className="flex items-baseline gap-3 mb-4">
                   <span className="text-4xl font-bold text-blue-600">
                     ${Number(product.precio).toLocaleString('es-MX', { minimumFractionDigits: 2 })}
                   </span>
                   <span className="text-sm text-gray-500">MXN</span>
                 </div>
-                <p className={`text-sm font-medium ${product.existencia > 0 ? 'text-green-600' : 'text-red-500'}`}>
-                  {product.existencia > 0 ? `✓ ${product.existencia} unidades en existencia` : '✗ Sin existencia'}
-                </p>
-                {product.disponible > 0 && (
-                  <p className="text-sm text-gray-500 mt-1">{product.disponible} disponibles para entrega</p>
-                )}
+
+                <div className="border-t border-gray-200 pt-3">
+                  <p className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-2">
+                    Disponibilidad por sucursal
+                  </p>
+                  {Array.isArray(product.stock) && product.stock.length > 0 ? (
+                    <div className="space-y-2">
+                      {product.stock.map(s => (
+                        <div key={s.sucursal} className="flex items-center justify-between">
+                          <div className="flex items-center gap-2">
+                            <span className={`w-2 h-2 rounded-full flex-shrink-0 ${s.existencia > 0 ? 'bg-green-500' : 'bg-red-400'}`} />
+                            <span className="text-sm text-gray-700 font-medium">{s.sucursal}</span>
+                          </div>
+                          {s.existencia > 0 ? (
+                            <span className="text-sm font-semibold text-green-600 bg-green-50 px-2 py-0.5 rounded-full">
+                              {Number(s.existencia).toLocaleString()} pzas
+                            </span>
+                          ) : (
+                            <span className="text-sm font-medium text-red-500 bg-red-50 px-2 py-0.5 rounded-full">
+                              Sin existencia
+                            </span>
+                          )}
+                        </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <p className="text-sm text-gray-400">Consultando disponibilidad…</p>
+                  )}
+                </div>
               </div>
 
               {/* Cantidad + agregar */}
@@ -198,6 +252,15 @@ const ProductoDetalle = () => {
                   Ver pedido
                 </Link>
               </div>
+
+              <button
+                type="button"
+                onClick={() => setWhatsAppOpen(true)}
+                className="flex items-center justify-center gap-3 w-full bg-green-500 hover:bg-green-600 active:scale-95 text-white px-8 py-4 rounded-lg transition-all font-semibold text-base"
+              >
+                <FaWhatsapp size={22} />
+                Quiero más información de esta pieza por WhatsApp
+              </button>
 
               <div className="grid grid-cols-3 gap-4 text-center mt-2">
                 <div className="bg-gray-50 rounded-lg p-4">
@@ -226,12 +289,18 @@ const ProductoDetalle = () => {
                     ['Departamento', product.departamento],
                     ['Categoría', product.categoria],
                     ['Características', product.caracteristicas],
-                    ['Existencia', product.existencia],
-                    ['Disponible', product.disponible],
                   ].map(([label, value]) => value != null && (
                     <tr key={label}>
                       <td className="py-2 pr-4 text-gray-500 font-medium whitespace-nowrap">{label}</td>
                       <td className="py-2 text-gray-800">{value}</td>
+                    </tr>
+                  ))}
+                  {Array.isArray(product.stock) && product.stock.map(s => (
+                    <tr key={`stock-${s.sucursal}`}>
+                      <td className="py-2 pr-4 text-gray-500 font-medium whitespace-nowrap">Existencia {s.sucursal}</td>
+                      <td className={`py-2 font-semibold ${s.existencia > 0 ? 'text-green-600' : 'text-red-500'}`}>
+                        {s.existencia > 0 ? Number(s.existencia).toLocaleString() : 'Sin existencia'}
+                      </td>
                     </tr>
                   ))}
                 </tbody>
@@ -240,6 +309,14 @@ const ProductoDetalle = () => {
           </div>
         </div>
       </div>
+
+      <SucursalDialog
+        open={whatsAppOpen}
+        onClose={() => setWhatsAppOpen(false)}
+        onSelect={handleSelectSucursal}
+        title="¿Con qué sucursal deseas contactarte?"
+        subtitle="Selecciona la sucursal a la que quieres enviarle la información de esta pieza."
+      />
     </div>
   );
 };

@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Link, useLocation, useHistory } from 'react-router-dom';
 import logo from '../../assets/img/miniLogo.png';
 import config from '../../config.js';
+import { getProfile } from '../../utils.js';
 import SearchBar from '../../components/SearchBar';
 import Navbar from '../../components/Navbar';
 import { trackSearch } from '../../analytics';
@@ -35,7 +36,8 @@ const BuscarResultados = () => {
     }
     setLoading(true);
     setSearched(false);
-    fetch(`${config.API_URL}/articles/0/clave/${encodeURIComponent(query.trim())}`)
+    const priceTier = getProfile()?.price ?? 1;
+    fetch(`${config.API_URL}/articles/${priceTier}/clave/${encodeURIComponent(query.trim())}`)
       .then(r => r.json())
       .then(data => {
         setResults(Array.isArray(data) ? data : []);
@@ -134,7 +136,7 @@ const BuscarResultados = () => {
                     <th className="px-3 sm:px-4 py-3 text-left">Descripción</th>
                     <th className="px-3 sm:px-4 py-3 text-left hidden sm:table-cell">Características</th>
                     <th className="px-3 sm:px-4 py-3 text-right">Precio</th>
-                    <th className="px-3 sm:px-4 py-3 text-right hidden sm:table-cell">Existencia</th>
+                    <th className="px-3 sm:px-4 py-3 text-left hidden sm:table-cell">Sucursales</th>
                     <th className="px-3 sm:px-4 py-3"></th>
                   </tr>
                 </thead>
@@ -157,8 +159,8 @@ const BuscarResultados = () => {
                     </tr>
                   ) : (
                     sorted.map((product, index) => {
-                      const existencia = Number(product.existenciaHenequen || 0) + Number(product.existenciaMezquital || 0);
-                      const enStock = existencia > 0;
+                      const stock = Array.isArray(product.stock) ? product.stock : [];
+                      const enStock = stock.some(s => s.existencia > 0);
                       return (
                         <tr
                           key={product.clave + index}
@@ -177,16 +179,22 @@ const BuscarResultados = () => {
                           <td className="px-3 sm:px-4 py-3 text-right font-bold text-blue-600 whitespace-nowrap text-xs sm:text-sm">
                             ${Number(product.precio).toLocaleString('es-MX', { minimumFractionDigits: 2 })}
                           </td>
-                          <td className="px-3 sm:px-4 py-3 text-right hidden sm:table-cell">
-                            {enStock ? (
-                              <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold bg-green-100 text-green-700 whitespace-nowrap">
-                                {existencia.toLocaleString()} pzas
-                              </span>
-                            ) : (
-                              <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold bg-red-100 text-red-600 whitespace-nowrap">
-                                Sin stock
-                              </span>
-                            )}
+                          <td className="px-3 sm:px-4 py-3 hidden sm:table-cell">
+                            <div className="flex flex-col gap-1">
+                              {stock.map(s => (
+                                <span
+                                  key={s.sucursal}
+                                  className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium whitespace-nowrap ${
+                                    s.existencia > 0
+                                      ? 'bg-green-100 text-green-700'
+                                      : 'bg-gray-100 text-gray-400 line-through'
+                                  }`}
+                                >
+                                  <span className={`w-1.5 h-1.5 rounded-full ${s.existencia > 0 ? 'bg-green-500' : 'bg-gray-300'}`} />
+                                  {s.sucursal}: {Number(s.existencia).toLocaleString()}
+                                </span>
+                              ))}
+                            </div>
                           </td>
                           <td className="px-3 sm:px-4 py-3 text-center">
                             <Link

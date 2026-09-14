@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { useHistory } from 'react-router-dom';
 import config from '../../config.js';
+import { getProfile } from '../../utils.js';
 
 const RECENT_KEY = 'guerrmo_recent_searches';
 const MAX_RECENT = 6;
@@ -62,7 +63,8 @@ const SearchBar = ({ placeholder = 'Buscar refacción...', autoFocus = false, cl
     }
     setLoadingSugg(true);
     const controller = new AbortController();
-    fetch(`${config.API_URL}/articles/0/clave/${encodeURIComponent(debouncedValue.trim())}`, {
+    const priceTier = getProfile()?.price ?? 1;
+    fetch(`${config.API_URL}/articles/${priceTier}/clave/${encodeURIComponent(debouncedValue.trim())}`, {
       signal: controller.signal,
     })
       .then(r => r.json())
