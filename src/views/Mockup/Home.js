@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { Link } from 'react-router-dom';
-import { FiMapPin, FiPhone, FiMail, FiClock, FiTruck, FiPackage, FiZap, FiArrowLeft, FiArrowRight } from 'react-icons/fi';
+import { FiMapPin, FiPhone, FiMail, FiClock, FiTruck, FiPackage, FiZap, FiArrowRight, FiChevronLeft, FiChevronRight } from 'react-icons/fi';
 import logo from '../../assets/img/miniLogo.png';
 const noImage = 'https://guerrmo-store.s3.us-east-1.amazonaws.com/general/default-image.png';
 import config from '../../config.js';
@@ -8,9 +8,52 @@ import SearchBar from '../../components/SearchBar';
 import Navbar from '../../components/Navbar';
 import SEO from '../../components/SEO';
 
+const PROMO_BANNERS = [
+  {
+    id: 'promo-1',
+    image: 'https://images.unsplash.com/photo-1486262715619-67b85e0b08d3?auto=format&fit=crop&w=1600&q=80',
+    alt: 'Promoción en refacciones automotrices',
+    link: '/catalogo',
+  },
+  {
+    id: 'promo-2',
+    image: 'https://images.unsplash.com/photo-1619642751034-765dfdf7c58e?auto=format&fit=crop&w=1600&q=80',
+    alt: 'Promoción en suspensión y frenos',
+    link: '/catalogo?category=SUSPENSION',
+  },
+  {
+    id: 'promo-3',
+    image: 'https://images.unsplash.com/photo-1492144534655-ae79c964c9d7?auto=format&fit=crop&w=1600&q=80',
+    alt: 'Entrega a domicilio en Ciudad Juárez',
+    link: '/catalogo',
+  },
+];
+
+const AUTO_SCROLL_MS = 5000;
+
 const Home = () => {
   const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [currentSlide, setCurrentSlide] = useState(0);
+  const [isSearchFocused, setIsSearchFocused] = useState(false);
+
+  const totalSlides = 1 + PROMO_BANNERS.length;
+
+  const nextSlide = useCallback(() => {
+    setCurrentSlide(prev => (prev + 1) % totalSlides);
+  }, [totalSlides]);
+
+  const prevSlide = useCallback(() => {
+    setCurrentSlide(prev => (prev - 1 + totalSlides) % totalSlides);
+  }, [totalSlides]);
+
+  useEffect(() => {
+    if (isSearchFocused) return;
+    const timer = setInterval(() => {
+      nextSlide();
+    }, AUTO_SCROLL_MS);
+    return () => clearInterval(timer);
+  }, [currentSlide, isSearchFocused, nextSlide]);
 
   const scrollToSucursales = (e) => {
     e.preventDefault();
@@ -46,35 +89,104 @@ const Home = () => {
       />
       <Navbar />
 
-      {/* Hero Section */}
-      <section className="bg-gradient-to-br from-blue-600 to-blue-300 text-white py-20">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid md:grid-cols-2 gap-12 items-center">
-            <div>
-              <h1 className="text-4xl font-bold mb-6">
-                ¿Qué pieza estás buscando?
-              </h1>
-              <p className="text-xl mb-1 font-bold">
-                Solicita tus productos en línea y recíbelos en tu domicilio.
-              </p>
-              <p className="text-md mb-8 text-white">
-                Refacciones de calidad en Ciudad Juárez.
-              </p>
-              <div className="flex flex-col sm:flex-row gap-4">
-                <Link to="/catalogo" className="bg-white text-blue-600 px-8 py-4 rounded-lg font-semibold hover:bg-gray-100 transition text-center">
-                  Ver catálogo completo
-                </Link>
-              </div>
-            </div>
-            <div className="hidden md:block">
-              <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-8">
-                <div className="bg-white rounded-lg p-4">
-                  <p className="text-gray-700 font-semibold mb-3 text-sm">Busca tu refacción</p>
-                  <SearchBar placeholder="Balatas, filtros, baterías, bujías..." />
+      {/* Hero Carousel Section */}
+      <section className="relative overflow-hidden bg-blue-600 select-none">
+        <div
+          className="flex transition-transform duration-500 ease-in-out"
+          style={{ transform: `translateX(-${currentSlide * 100}%)` }}
+        >
+          {/* Slide 0: Original Blue Hero Section */}
+          <div
+            className="w-full shrink-0 bg-gradient-to-br from-blue-600 to-blue-300 text-white py-20 px-8 sm:px-14"
+            onFocusCapture={() => setIsSearchFocused(true)}
+            onBlurCapture={() => setIsSearchFocused(false)}
+          >
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+              <div className="grid md:grid-cols-2 gap-12 items-center">
+                <div>
+                  <h1 className="text-4xl font-bold mb-6">
+                    ¿Qué pieza estás buscando?
+                  </h1>
+                  <p className="text-xl mb-1 font-bold">
+                    Solicita tus productos en línea y recíbelos en tu domicilio.
+                  </p>
+                  <p className="text-md mb-8 text-white">
+                    Refacciones de calidad en Ciudad Juárez.
+                  </p>
+                  <div className="flex flex-col sm:flex-row gap-4">
+                    <Link to="/catalogo" className="bg-white text-blue-600 px-8 py-4 rounded-lg font-semibold hover:bg-gray-100 transition text-center">
+                      Ver catálogo completo
+                    </Link>
+                  </div>
+                </div>
+                <div className="hidden md:block">
+                  <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-8">
+                    <div className="bg-white rounded-lg p-4">
+                      <p className="text-gray-700 font-semibold mb-3 text-sm">Busca tu refacción</p>
+                      <SearchBar placeholder="Balatas, filtros, baterías, bujías..." />
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
           </div>
+
+          {/* Slides 1..N: Promotional Image Banners */}
+          {PROMO_BANNERS.map((banner) => (
+            <div key={banner.id} className="relative w-full shrink-0 min-h-[320px] md:min-h-[360px] bg-gray-900">
+              {banner.link ? (
+                <Link to={banner.link} className="block w-full h-full">
+                  <img
+                    src={banner.image}
+                    alt={banner.alt}
+                    className="absolute inset-0 w-full h-full object-cover"
+                    onError={e => { e.target.src = noImage; }}
+                  />
+                </Link>
+              ) : (
+                <img
+                  src={banner.image}
+                  alt={banner.alt}
+                  className="absolute inset-0 w-full h-full object-cover"
+                  onError={e => { e.target.src = noImage; }}
+                />
+              )}
+            </div>
+          ))}
+        </div>
+
+        {/* Botón Izquierdo */}
+        <button
+          type="button"
+          onClick={prevSlide}
+          aria-label="Banner anterior"
+          className="absolute left-3 sm:left-5 top-1/2 -translate-y-1/2 z-20 w-11 h-11 rounded-full bg-white/80 hover:bg-white text-gray-800 shadow-lg flex items-center justify-center transition focus:outline-none"
+        >
+          <FiChevronLeft size={24} />
+        </button>
+
+        {/* Botón Derecho */}
+        <button
+          type="button"
+          onClick={nextSlide}
+          aria-label="Banner siguiente"
+          className="absolute right-3 sm:right-5 top-1/2 -translate-y-1/2 z-20 w-11 h-11 rounded-full bg-white/80 hover:bg-white text-gray-800 shadow-lg flex items-center justify-center transition focus:outline-none"
+        >
+          <FiChevronRight size={24} />
+        </button>
+
+        {/* Indicadores inferiores */}
+        <div className="absolute bottom-4 left-1/2 -translate-x-1/2 z-20 flex items-center gap-2">
+          {Array.from({ length: totalSlides }).map((_, idx) => (
+            <button
+              key={idx}
+              type="button"
+              onClick={() => setCurrentSlide(idx)}
+              aria-label={`Ir al banner ${idx + 1}`}
+              className={`h-2.5 rounded-full transition-all ${currentSlide === idx ? 'w-8 bg-white shadow' : 'w-2.5 bg-white/50 hover:bg-white/80'
+                }`}
+            />
+          ))}
         </div>
       </section>
 
